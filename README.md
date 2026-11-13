@@ -1,7 +1,8 @@
 # An explicit function that needs more than 4.67n gates
 
 This repository contains a proof that an explicit Boolean function in P requires circuits of size at least
-(4.6718 − o(1))·n over the full binary basis, together with the computer-checked certificate the proof relies on.
+(4.6722 − o(1))·n over the full binary basis, together with the short program that certifies the one numerical
+step of the proof.
 
 Author: Arthur Ostapenko, November 2026.
 
@@ -26,7 +27,7 @@ a function in NP would give P ≠ NP. What is actually known is a small constant
 | 2026 | 4n − O(log n) | Mishra, Santhanam | gate elimination |
 | 2026 | (4.5624 − ε)n | McGuire, Schlesinger, Williams | cutwidth of the circuit's wire graph |
 | 2026 | (4.6155 − ε)n | McGuire, Schlesinger, Williams | same, with a computer-assisted cutwidth bound (see their repository) |
-| 2026 | **(4.6718 − ε)n** | this repository | same route, better cutwidth bound |
+| 2026 | **(4.6722 − ε)n** | this repository | same route, better cutwidth bound |
 
 So the constant is still far from anything that separates complexity classes. It is, however, the place where
 the difficulty of the problem can be measured, and each new technique that moves it is worth understanding.
@@ -34,9 +35,9 @@ the difficulty of the problem can be measured, and each new technique that moves
 ## The result
 
 **Theorem.** There is an explicit language L in P such that for every ε > 0 and every sufficiently large input
-length N, every B2 circuit deciding L on inputs of length N has at least (23359/5000 − ε)·N gates.
+length N, every B2 circuit deciding L on inputs of length N has at least (23361/5000 − ε)·N gates.
 
-More precisely, C(L_N) ≥ c·N − R(N) with c = 63617/13617 = 4.67188… and an explicit remainder R(N) = O(N/log² N).
+More precisely, C(L_N) ≥ c·N − R(N) with c = 159039/34039 = 4.67225… and an explicit remainder R(N) = O(N/log² N).
 The function is the indicator of "the norm of z equals 1" for an element z of a finite field of characteristic 2,
 where the polynomials defining the field are part of the input and are validated by the function itself. It is
 defined at every input length.
@@ -62,7 +63,7 @@ gates. It measures how much information has to cross a cut of the circuit.
    then steps 1–3 give s ≥ (1 + 1/(2γ))·n − o(n). The trivial value γ = 1/6 gives exactly 4n. McGuire,
    Schlesinger and Williams prove γ ≤ 0.14035, which gives 4.5624n, and with a computer-assisted argument
    γ ≤ 0.13830, which gives 4.6155n.
-5. **Cutwidth of cubic graphs — the new part.** We prove γ ≤ 0.13617.
+5. **Cutwidth of cubic graphs — the new part.** We prove γ ≤ 0.136156.
    - Give every vertex a Gaussian label that is correlated along non-backtracking walks, and order the vertices
      by label. This is the starting point of the earlier work (also Gaspers, 2026).
    - Improve the order locally, twice: first raise each label to the median of its neighbours' labels when that
@@ -73,8 +74,18 @@ gates. It measures how much information has to cross a cut of the circuit.
      for 0.51.
    - Global submodularity is enough for a Gaussian comparison argument: among all cubic multigraphs the
      infinite 3-regular tree is the worst case, because every other graph has larger correlations.
-   - On the tree the bound becomes a one-dimensional integral G(t). Its maximum, 0.1361516 at t ≈ 0.04, is
-     bounded above by 0.13617 by an interval-arithmetic program.
+   - On the tree the bound becomes an explicit function G(t) of the threshold, a combination of three Gaussian
+     probabilities. Its maximum is about 0.1361516, near t = 0.04.
+6. **The numerical step.** A short Python program proves G(t) ≤ 0.136156 for every real t, with interval
+   arithmetic that it implements itself.
+   - Two of the three probabilities are probabilities that a Gaussian vector lies in a convex set that moves
+     linearly with t. Such functions are log-concave in t (Prékopa–Leindler). So lower bounds at the two ends
+     of an interval give a lower bound inside it, with a loss of second order in the length of the interval.
+   - Each probability is an integral of a function of the form e^(−q)·g with g log-concave. On a box such an
+     integral is at least the volume times the geometric mean of the corner values times an explicit factor.
+     This is second order and has no error term.
+   - The real line is covered by two analytic tails and 112 intervals. Every interval bound is compared with
+     the target in exact rational arithmetic.
 
 ## What is new here, and what is not
 
@@ -85,8 +96,8 @@ Not ours:
 - the trick of putting the field-defining polynomials into the input (credited in `proof.md`).
 
 Ours: the cutwidth bound of step 5 — the two-step local improvement, the global submodularity lemma, the
-comparison theorem in the form needed for it, and the certificate — and a self-contained write-up of the whole
-chain for a different explicit function, with an explicit remainder term.
+comparison theorem in the form needed for it, and the certificate of step 6 — and a self-contained write-up of
+the whole chain for a different explicit function, with an explicit remainder term.
 
 ## How it was checked, and what has not been checked
 
@@ -95,27 +106,34 @@ chain for a different explicit function, with an explicit remainder term.
   configurations on the tree).
 - The pointwise inequality "cut ≤ energy" was verified exhaustively on all cubic multigraphs with up to 8
   vertices (322 million cases).
-- The bound on the integral is certified by `edcert.c` (outward-rounded interval arithmetic). Its
-  error analysis is written out in `cutwidth.md` §6. A second program, written independently with a different
-  method, agrees.
+- The numerical step is certified by `certify.py`. `certificate.md` proves, function by function, that its
+  output implies the bound, including a full proof of the Prékopa–Leindler theorem. Three other programs,
+  written independently with different methods, give the same maximum 0.1361516.
+- The program's lower bounds were compared with direct quadrature and with a Monte Carlo simulation from the
+  definition (24 million samples). They are below the true values everywhere, by about 10^-6 near the maximum.
+- An automated proof reviewer, which runs the program itself in a sandbox and reads all files, accepted this
+  version and two weaker earlier versions (constants 4.5624 and 4.66).
 - **Not done:** review by a human expert and formal verification. The margin of the certificate is small
-  (0.1361516 against 0.13617), so the numerical part deserves an independent re-implementation.
+  (the largest interval bound is 0.136154913 against the target 0.136156), and the new parts were written
+  within one day.
 
 ## Repository layout
 
     proof.md          the function, the main theorem, and how the parts fit together (start here)
     circuit.md        steps 1–4: wire graph, kernel, branching program, edge lower bound
     cutwidth.md       step 5: the cutwidth theorem for cubic multigraphs
+    certificate.md    step 6: the Prékopa–Leindler theorem, the lemmas behind the program, its error analysis
+    certify.py        the program of step 6 (Python standard library only)
     krs.md            the norm-graph theorem with a complete proof
-    edcert.c          interval-arithmetic certificate for the integral bound
-    certify_small.py  exact checks of the finite facts and constants, and a weaker bound by a different method
-    earlier/          a simpler version of step 5 (γ ≤ 0.1375, constant 51/11 ≈ 4.636), same file layout
+    earlier/          the first version of step 5 (γ ≤ 0.1375, constant 51/11 ≈ 4.636) with a certificate in C
 
-To run the certificate (about 11 minutes on one core):
+To run the certificate (two to three seconds):
 
-    gcc -O2 -std=c11 -ffp-contract=off -fno-fast-math -o edcert edcert.c -lm
-    ./edcert full 13617000               # last line: RESULT: CERTIFIED for gamma = 13617000/10^8
-    ./edcert slab 13615000 1024 40 41    # control: must fail, since the true maximum is above 0.13615
+    echo '{}' | python3 certify.py
+
+It prints one JSON object. The fields to look at are `certified` (must be `true`), `cover` (104 base intervals,
+112 leaves, contiguous from −5/4 to 2) and `largest_certified_bound` (0.136154913). If the target in the first
+lines of the program is lowered to 0.13615, below the true maximum, the program reports a failed interval.
 
 ## Where this could go next
 
@@ -144,9 +162,12 @@ To run the certificate (about 11 minutes on one core):
 - S. Gaspers, Path decompositions of sparse graphs via Gaussian sweeps and faster exponential algorithms,
   arXiv:2611.05146 (2026).
 - J. Kollár, L. Rónyai, T. Szabó, Norm-graphs and bipartite Turán numbers, Combinatorica 16(3) (1996), 399–406.
+- A. Prékopa, On logarithmic concave measures and functions, Acta Sci. Math. (Szeged) 34 (1973), 335–343.
+- L. Leindler, On a certain converse of Hölder's inequality II, Acta Sci. Math. (Szeged) 33 (1972), 217–223.
 - L. Lichev, D. Mitsche, On the minimum bisection of random 3-regular graphs, Electron. J. Combin. 30(2) (2023),
   P2.40.
 
 ## License
 
-Text (`*.md`): CC BY 4.0, see `LICENSE-TEXT`. Code (`edcert.c`, `certify_small.py`): MIT, see `LICENSE-CODE`.
+Text (`*.md`): CC BY 4.0, see `LICENSE-TEXT`. Code (`certify.py` and the programs in `earlier/`): MIT, see
+`LICENSE-CODE`.

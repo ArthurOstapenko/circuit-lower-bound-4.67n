@@ -1,9 +1,9 @@
 # A conditional (1 + 1/(2γ))N lower bound for one explicit language in P
 
-Status: one of the three proof files (with `cutwidth.md` and `krs.md`). Theorem 1 below is
-conditional on the graph hypothesis H(γ,h) and uses premise P1, which `krs.md` proves; everything else is
-proved here. `cutwidth.md` proves H(γ,h) for the explicit γ and h stated in its §0; `proof.md` §6 combines
-the two files.
+Status: one of the four proof files (with `cutwidth.md`, `certificate.md` and `krs.md`).
+Theorem 1 below is conditional on the graph hypothesis H(γ,h) and uses premise P1, which `krs.md` proves;
+everything else is proved here. `cutwidth.md` (with `certificate.md` for its Proposition C) proves H(γ,h) for
+the explicit γ and h stated in its §0; `proof.md` §6 combines this file with `cutwidth.md`.
 
 **Credit.** The route (circuit -> wire graph -> cutwidth-ordered read-once nondeterministic program ->
 rectangle edge counting) is from S. McGuire, S. Schlesinger, R. Williams, "Explicit functions requiring larger

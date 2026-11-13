@@ -1,22 +1,28 @@
-# Cutwidth of cubic multigraphs is at most (13617/100000)·D + h_d(D)
+# Cutwidth of cubic multigraphs is at most (34039/250000)·D + h_d(D)
 
-Status: one of the proof files (with `circuit.md` and `krs.md`). Theorem 1 below is the
-hypothesis H(γ,h) of `circuit.md` §0 for γ = γ_d = 13617/100000 and the explicit h = h_d of §0; `proof.md` §6
-combines this file with `circuit.md`. Supplied code: `edcert.c` (the certificate of Proposition C, §6, and the
-exhaustive check of Lemma 4.4) and `certify_small.py` (an independent pure-Python re-check of the finite facts, of
-the witnesses of §7 and of a weaker form of Proposition C, §6.5).
+Status: one of the proof files (with `circuit.md`, `certificate.md` and `krs.md`). Theorem 1
+below is the hypothesis H(γ,h) of `circuit.md` §0 for γ = γ_d = 34039/250000 and the explicit h = h_d of §0;
+`proof.md` §6 combines this file with `circuit.md`. Proposition C (sup_t G_d(t) ≤ γ_d = 34039/250000) is proved
+in `certificate.md` (see §6) and established by the program `certify.py` (Python
+standard library only, its own outward-rounded interval arithmetic), which anyone can run in a few seconds; its
+method and error analysis are in `certificate.md`, and its output object reports `certified: true` together with
+the cover and the largest certified bound. The same program re-checks by exhaustive enumeration the finite facts
+(C1), (C2), (C6) and the rational witnesses of §7 (C4), all of which are also proved in the text.
 
 **Credit.** The route from cutwidth bounds to circuit lower bounds is due to S. McGuire, S. Schlesinger and
-R. Williams (preprint, November 2026). Their best constant, in the normalisation used here, is 0.14035 by hand
-and 0.13830 with a computer-assisted argument. Ordering the vertices of a cubic graph by thresholds of a Gaussian field
+R. Williams (preprint, November 2026). Ordering the vertices of a cubic graph by thresholds of a Gaussian field
 goes back to that preprint and to S. Gaspers (arXiv:2611.05146). New here: the comparison of the field on any
 cubic multigraph with the field on the 3-regular tree for local energies whose *formal sum over the tree* is
 submodular, although the local terms are not (Theorem 3.3), and the post-processing of the level sets by the set
 maps E and D with the energy f (§4). They reduce the constant to an integral on the tree, certified in interval
-arithmetic (§5–§6). Every step is proved in this file; none of the sources is used as a premise.
+arithmetic (§5; `certificate.md`). Every step is proved in this file or in `certificate.md`; none of the sources
+is used as a premise. McGuire,
+Schlesinger and Williams also have a computer-assisted cutwidth constant of about 0.1383 in this normalisation,
+i.e. (4.6155 − ε)n (public repository github.com/rrwilliams0/circuit-lb-4.6155n); it is not used here.
 
-**Labels.** [P] = proved here, from the facts listed in §1.0. [C] = checked by supplied code, the program named
-(`edcert.c`: interval arithmetic, §6; exact integer or rational checks are marked [C, exact]). [S] = checked by
+**Labels.** [P] = proved here, from the facts listed in §1.0. [C] = checked by the program `certify.py`
+(interval arithmetic, `certificate.md`; exact integer or rational checks are marked [C, exact]).
+[S] = checked by
 script, never used as a proof step. Notation is local to this file: D is a number of vertices, R a walk length,
 N_k a walk count; N and L of `circuit.md` do not appear.
 
@@ -28,9 +34,9 @@ v; K is **cubic** if every degree is 3. For P ⊆ V, **cut(P)** is the number of
 (loops never count). An ordering σ = (v_1, …, v_D) of V has cw(σ) := max_{1≤i<D} cut({v_1, …, v_i}) (0 if
 D = 1), and cw(K) := min_σ cw(σ). This is the convention of `circuit.md` Definition 4.3.
 
-    γ_d := 13617/100000 = 0.13617,
-    h_d(D) := (136383/100000)·D                                       for 1 ≤ D < 2^40,
-    h_d(D) := min{ (136383/100000)·D,  958·D/(log₂D − 3)² + 38·D^{8/9} }   for D ≥ 2^40.
+    γ_d := 34039/250000 = 0.136156,
+    h_d(D) := (340961/250000)·D                                       for 1 ≤ D < 2^40,
+    h_d(D) := min{ (340961/250000)·D,  958·D/(log₂D − 3)² + 38·D^{8/9} }   for D ≥ 2^40.
 
 **Theorem 1** [P + C]. Every cubic multigraph K on D vertices (connected or not; loops and parallel edges
 allowed) satisfies cw(K) ≤ γ_d·D + h_d(D). The function h_d is nonnegative and nondecreasing on the positive
@@ -44,23 +50,25 @@ integers and h_d(D)/D → 0. In particular **H(γ_d, h_d) holds** in the sense o
 V, P2, P3 are probabilities of three events for one explicit Gaussian vector on ten coordinates and W = 3P2 − P3
 (§5.1–§5.2). Equivalently G_d = Φ − P4 − (3/2)P2 + P3/2 with P4 = Φ − V.
 
-[S] Floating-point quadrature gives max_t G_d(t) ≈ 0.1361516 at t ≈ 0.0404 (two independent quadratures); the
-certified upper bounds of the program near the maximum are ≤ 0.13616986 (§6.4).
+[S] Floating-point quadrature gives max_t G_d(t) ≈ 0.1361516 at t ≈ 0.0404 (two independent quadratures), a
+margin of about 4·10⁻⁶ below γ_d; the largest bound certified by `certify.py` is reported in its output
+(`certificate.md` §6).
 
 **Plan.** §1 preliminaries (walks, the universal cover, deck transformations). §2 the field and the lifting lemma;
 tree correlations in closed form with an error bound for all R ≥ 4. §3 Gaussian comparison: smoothing, the
 two-field estimate (Lemma 3.2) and the global comparison theorem (Theorem 3.3). §4 the set maps, the charging
 inequalities, the window energy f and its global submodularity (Lemma 4.4). §5 the tree vector and the reduction
-of the constant to G_d. §6 the certificate with the full error analysis of its arithmetic. §7 proofs of
-Theorems 2 and 1 with rational witnesses (N1)–(N8).
+of the constant to G_d. §6 the certificate: Proposition C is proved in `certificate.md`, with the full error
+analysis of its arithmetic. §7 proofs of Theorems 2 and 1 with rational witnesses (N1)–(N8).
 
 ## 1. Preliminaries
 
 **1.0 Assumed.** Undergraduate analysis and probability: fundamental theorem of calculus; mean value theorem;
-Taylor's theorem with Lagrange remainder; the error formula of Simpson's rule (for g ∈ C⁴[x_0, x_1], h = x_1 − x_0,
-m = (x_0 + x_1)/2: ∫g = (h/6)(g(x_0) + 4g(m) + g(x_1)) − (h⁵/2880)g⁗(ξ), some ξ); differentiation under the
-integral sign (continuous integrand and derivative, integrable dominating function); Fubini; polar coordinates;
-dominated convergence; linearity of expectation; the union bound; Chebyshev's inequality; Jensen's inequality for
+Taylor's theorem with Lagrange remainder; differentiation under the
+integral sign (continuous integrand and derivative, integrable dominating function); Fubini and Tonelli; polar
+coordinates; dominated and monotone convergence; Lebesgue measure on Rⁿ: inner regularity (a measurable set of
+finite measure contains compact sets of measure arbitrarily close to its own) and the layer-cake formula
+∫f = ∫_0^∞ |{f ≥ μ}|dμ for measurable f ≥ 0 (both used only for Theorem PL in `certificate.md`); linearity of expectation; the union bound; Chebyshev's inequality; Jensen's inequality for
 conditional expectations; independence of functions of disjoint sets of independent variables; for random
 variables with values in intervals of length w, |Cov| ≤ w²/4. Hilbert space L²(φ): an orthonormal sequence whose
 span is dense gives the expansion G = Σ⟨G, e_n⟩e_n and Parseval's identity. An entire function equals its Taylor
@@ -70,7 +78,8 @@ nondegenerate centred Gaussian pair with variances v and covariance c has densit
 One-dimensional Gaussian integration by parts: E[η h(η)] = E[h′(η)] for η ~ N(0,1), h ∈ C¹ with h, h′ bounded.
 Fourier uniqueness: an integrable function on R whose Fourier transform vanishes is 0 a.e. The Hermite generating
 function e^{sx − s²/2} = Σ_{n≥0} sⁿ He_n(x)/n! (He_n monic, ∫He_mHe_nφ = n!·[m=n]). φ(x) = e^{−x²/2}/√(2π),
-Φ(x) = ∫_{−∞}^x φ. IEEE 754 binary64 arithmetic: +, −, ×, ÷, √ return the correctly rounded result (§6.2).
+Φ(x) = ∫_{−∞}^x φ. IEEE 754 binary64 arithmetic: +, −, ×, ÷, √ return the correctly rounded result
+(`certificate.md` §6).
 
 **1.1 Darts and walks** [P]. Every edge has two *darts*, one for each direction; d̄ is the reverse of d; the two
 darts of a loop at v both have tail = head = v and are distinct; no dart equals its reverse. Cubic means: every
@@ -352,7 +361,7 @@ j ≠ i, Δ_xΔ_y g = (1 − s_0)·Δ_x b_i·Δ_y b_j·1{m = 0}/2 ∈ [0, 1/2], 
 ∈ [−1, 0]; pairs {0, (i,j)}: −Δ_0Δ g ∈ [0, 1/2]; all other pairs: −Δ_xΔ_y g ∈ [−1/2, 0].
 (e) Clear from the formula. ∎
 
-[C, exact] `certify_small.py` (C1) checks (b)–(e) exhaustively for 2f in integers (45 pairs × 256 contexts; the
+[C, exact] `certify.py` (C1) checks (b)–(e) exhaustively for 2f in integers (45 pairs × 256 contexts; the
 48 automorphisms), and the identity ψ(k) = Σ_{i<j}b_ib_j − b_1b_2b_3.
 
 **Lemma 4.4 (global submodularity)** [P; C, exact]. With f of this section, (G4) of Theorem 3.3 holds: for all
@@ -383,13 +392,11 @@ then the terms of (iii) equal λ each, gain_y = gain_r = 0, and Δ_pΔ_qH = 2λ 
 *Exhaustive verification (redo).* Automorphisms of T act transitively on ordered pairs at a given distance (map
 one geodesic onto another and extend outward level by level, as all vertices have degree 3), and they transport
 H_pq; so it suffices to take p = root of the ball B_6 (190 vertices) and q at distance d = 1, …, 4 along one
-geodesic. Then |A_pq| = 6, 4, 2, 1 and |U_pq| = 30, 22, 14, 10; for d ≥ 5, A_pq = ∅. `edcert globsub` [C, exact]
-enumerates all 2^28, 2^20, 2^12, 2^8 assignments of the other coordinates and sums Δ_pΔ_q(2f_a) over A_pq in
-integers (each window read through its frame): for λ = 1/2 the sums lie in [−4, 0], [−2, 0], [−1, 0], [−1, 0]
-(maximum 0 at every distance); for λ = 51/100 (×100 in integers) the maximum is +2/100 at d = 2 (14400
-assignments) and ≤ 0 elsewhere (4 s). `certify_small.py` (C6) [C, exact] computes the same maxima differently:
-coordinates in two or more windows of A_pq are enumerated (12, 8, 4, 0 of them), the others are maximised window
-by window; the results agree.
+geodesic. Then |A_pq| = 6, 4, 2, 1 and |U_pq| = 30, 22, 14, 10; for d ≥ 5, A_pq = ∅. `certify.py` (C6)
+[C, exact] computes, in integers, the maximum over all assignments of the other coordinates of the sum of
+Δ_pΔ_q(2f_a) over A_pq (each window read through its frame): coordinates in two or more windows of A_pq are
+enumerated (12, 8, 4, 0 of them), the others are maximised window by window. For λ = 1/2 the maximum is 0 at
+every distance; for λ = 51/100 (×100 in integers) it is +2/100 at d = 2 and ≤ 0 elsewhere.
 
 ## 5. The tree vector and the constant
 
@@ -404,7 +411,7 @@ by window; the results agree.
 Cov(W_i, W_{i1}) = (5/6)r_1 + √2/9 = 2√2/3 = w_1. Distance 2: Cov(W_i, W_j) = 8/9 − 1/18 = 5/6;
 Cov(U, W_{i1}) = 5/6; Cov(W_{i1}, W_{i2}) = 25/36 + 2/9 − 1/12 = 5/6. Distance 3: Cov(W_i, W_{j1}) =
 (5/6)r_1 − √2/18 = √2/2. Distance 4: Cov(W_{i1}, W_{j1}) = 25/36 − 1/9 = 7/12. ∎ [C, exact: (C2) of
-`certify_small.py`, arithmetic in Q(√2).] The covariance matrix is singular (rank 6); all pair correlations are
+`certify.py`, arithmetic in Q(√2).] The covariance matrix is singular (rank 6); all pair correlations are
 ≤ w_1 < 1.
 
 **5.2 Reduction.** For t ∈ R let s(t) := (1{W_x < t})_x and G_d(t) := E f(s(t)). Define
@@ -441,8 +448,7 @@ u² + 9(t − r_1u)²/c² = ((c²+8)/c²)(u − 6√2t/(c²+8))² + 9t²/(c²+8)
 
 The substitution τ = tan ψ (c² = 1/(1+τ²), dψ = dτ/(1+τ²)) turns the integrands into algebraic functions of τ:
 A = 1/√(9+8τ²), α = 9(1+τ²)/(2(9+8τ²)), β = (1 − (6√2−8)(1+τ²))/√(9+8τ²). On [0, π/3] A and c_0A increase
-with c, α decreases with c, and β increases with c (dβ/dc has the sign of 8c² + 2κc² + 8κ > 0, κ = 6√2 − 8);
-`certify_small.py` uses these monotonicities, `edcert.c` does not.
+with c, α decreases with c, and β increases with c (dβ/dc has the sign of 8c² + 2κc² + 8κ > 0, κ = 6√2 − 8).
 
 **5.4 P2.** Put λ := 2√6/3, H(z) := max(0, 2Φ(z) − 1), and for real a, u:
 M := 3(a − r_1u), κ_u := √12·(a − 5u/6), G_{a,u}(x) := 1{x < M}·H(κ_u − λx), K_a(u) := E[G_{a,u}(x_1)G_{a,u}(x_2)].
@@ -474,7 +480,8 @@ For the inequality: |Σ_{n>N}ρⁿI_n²| ≤ 2^{−(N+1)}Σ_n I_n² = 2^{−(N+1
 
 **Lemma 5.6** [P]. P3(t) = 0 for t ≤ 0. For t > 0 and any c_1 ≥ (1/r_1 − 1)/√(2π) (= 0.024199…) and
 c_2 ≥ 18(1 − r_1)² (= 0.058874…): P3(t) ≤ P3up(t) := c_1·t·(1 − e^{−c_2t²}), an increasing function of t.
-(P3up grows linearly; it is used only on [−1.125, 2]; the tails use P3 ≤ Φ(−t), Lemma 5.7.)
+(P3up grows linearly; it is meant only for bounded ranges of t, used in `certificate.md`; the tails use
+P3 ≤ Φ(−t), Lemma 5.7.)
 *Proof.* W_1 + W_2 + W_3 = 3r_1U = 2√2U, so all W_i < t forces U < 3t/(2√2) = t/r_1. Together with U ≥ t this is
 impossible for t ≤ 0. For t > 0: given U = u ∈ [t, t/r_1), the event all W_i < t is ζ ∈ Tri(3(t − r_1u)) ⊆
 Tri(3t(1 − r_1)); this triangle lies in the disc of radius twice its inradius, of Gaussian measure
@@ -489,163 +496,15 @@ for t ∈ [a, b]: W(t) ≥ 3P̲2 − P3up(b) (P3up := 0 for b ≤ 0), and G_d(t)
 
 ## 6. The certificate (Proposition C)
 
-`edcert.c` proves Proposition C by checking finitely many instances of Lemma 5.8 and the tails of Lemma 5.7.
-
-**6.1 What is checked.** (i) *Tails* (`edcert check 13617000`): Φ(−1.125) < 0.1304 < γ_d, so G_d ≤ γ_d for
-t ≤ −1.125; (7/2)Φ(−2) < 0.0797 < γ_d, so G_d ≤ γ_d for t ≥ 2; the inequalities of Lemma 5.6 for c_1 = 0.02434,
-c_2 = 0.0589 (the binary64 numbers nearest to these decimals), via 1/r_1 − 1 ≤ 0.061, 1/√(2π) ≤ 0.39895 and
-0.061·0.39895 ≤ 0.02434; and the side conditions of (A3), (A8) and the rounding mode (A0).
-(ii) *Cover*: the base slabs [k/1024, (k+1)/1024], −1152 ≤ k < 2048, which tile [−1.125, 2] with exact binary64
-ends. Each base slab is bisected (midpoints of dyadic numbers are exact, depth ≤ 16) until every leaf [a,b]
-satisfies V̄(a,b) + P3up(b)/2 ≤ γ or V̄(a,b) + P3up(b)/2 − (3/2)P̲2(a,b) ≤ γ, where γ is the lower end of an
-enclosure of 13617000/10⁸ = γ_d (all sums rounded upward, (A10)). No slab straddles 0. A leaf still open at depth
-16 is reported as FAIL, which means "not certified", never "false". By Lemma 5.8, G_d ≤ γ_d on every leaf; with
-the tails (true P3, not P3up), G_d(t) ≤ γ_d for all real t. This is exactly Proposition C.
-
-**6.2 Arithmetic: the enclosure lemma** [P]. u := 2^{−53}; a *double* is a binary64 number; fl(z) is the double
-nearest to the real z; up(x), dn(x) are the neighbouring doubles above and below x (up(0) = −dn(0) = 2^{−1074},
-up(+∞) = +∞). Each item states what a routine of `edcert.c` returns and proves it.
-
-(A0) *Model.* Every +, −, ×, ÷, √ on doubles returns fl of the exact result in round-to-nearest (IEEE 754; checked
-at run time with fegetround by `check`, `slab`, `full`); there is no extended precision (FLT_EVAL_METHOD = 0 and
-53-bit doubles, a compile-time check) and no fused contraction (-ffp-contract=off). Hence |fl(z) − z| ≤ u|z| +
-2^{−1075}, and if fl(z) is finite then dn(fl(z)) ≤ z ≤ up(fl(z)) (a real number lies between the two neighbours of
-its nearest double). Scaling by 2^j, floor, and ldexp to a normal result are exact. No NaN enters a bound. Interval + and −
-cannot create one: by inclusion a lower end is never +∞ and an upper end never −∞, so ∞ − ∞ does not occur; imul
-and idiv test for NaN and then mark the evaluation failed (result [−∞, ∞]; the caller falls back to the a-priori
-range, to 0 for K_lo, or to an infinite bound); isqrt_pos, exp_pt, Phi_pt, icos reject bad arguments in the same
-way. Moreover a leaf is accepted only through "bound ≤ γ", and a non-positive K_lo is skipped. Two enclosures of one number are intersected only after a
-check that they meet; if not, the program aborts (exit 4, "INTERNAL ERROR").
-
-(A1) *Interval primitives.* An interval is a pair of doubles [lo, hi]. iadd, isub, imul, idiv, isqrt_pos, isqr
-apply single IEEE operations to the ends (imul, idiv: all four products/quotients, then min and max), then dn to
-the lower and up to the upper end. By (A0) and the monotonicity of dn, up the result contains x∘y for all x, y in
-the operands (idiv needs 0 ∉ divisor, isqrt_pos a positive operand, else the evaluation is marked failed and its
-result is discarded; isqr returns lower end 0 when 0 is inside). So every expression evaluated with these
-primitives, and with iexp, iPhi, icos below (monotone on the ranges used), contains the exact value for all exact
-operands in the input intervals (*inclusion property*).
-
-(A2) *exp.* For a double x ≤ 700, `exp_pt` returns lo ≤ (1 − 8.5·10^{−13})e^x and hi ≥ (1 + 8.5·10^{−13})e^x if
-x ≥ −700, and [0, 10^{−300}] ∋ e^x if x < −700. Hence lo ≤ e^y ≤ hi for every real y with |y − x| ≤ 8·10^{−13}.
-*Proof.* c_1 := 1.4426950408889634 and c_2 := 0.6931471805599453 satisfy |c_1 − 1/ln 2| ≤ 1.11·10^{−16} and
-|c_2 − ln 2| ≤ 2.4·10^{−17} (C5, exact, ln 2 = Σ_k 1/(k2^k)). Let |x| ≤ 700, y := fl(xc_1), k := floor(y). Then
-|y − x/ln 2| ≤ 1010u + 700·1.11·10^{−16} < 1.91·10^{−13}, so −1011 ≤ k ≤ 1010 and r* := x − k ln 2 ∈
-[−1.33·10^{−13}, 0.69315]. The program's r̃ := fl(x − fl(kc_2)) satisfies |r̃ − r*| ≤ 701u + 1011·2.4·10^{−17} + u
-< 1.03·10^{−13}; r := max(r̃, 0) satisfies |r − r*| ≤ 1.33·10^{−13} and 0 ≤ r < 0.6932 (so the test r > 0.75
-never fires). Horner s_23 := 1, s_n := 1 + (r/n)·s_{n+1} (n = 22, …, 1), s := s_1, makes three roundings per step, each step a sum of
-nonnegative terms, so s = P(r)(1 + η), P(r) := Σ_{n≤22} rⁿ/n!, |η| ≤ (1 + u)^{66} − 1 < 7.4·10^{−15} (underflow in
-r/n changes s by < 2^{−1070}); and 0 ≤ e^r − P(r) ≤ r^{23}e^r/23! < 2.1·10^{−26}. The literals 1 ∓ 10^{−12} are
-doubles within 1.12·10^{−16} of 1 ∓ 10^{−12}; s times either is rounded once; ldexp(·, k) is exact (the result
-lies in [2^{−1012}, 2^{1012}]). With e^x = 2^k e^r e^{r*−r}, e^{|r*−r|} ≤ 1 + 1.34·10^{−13} and P(r) ≥ e^r(1 − 2.1·10^{−26}):
-hi/e^x ≥ (1 + 10^{−12} − 1.12·10^{−16})(1 − u)(1 − 7.4·10^{−15})(1 − 2.1·10^{−26})(1 − 1.34·10^{−13}) >
-1 + 8.5·10^{−13} and lo/e^x ≤ (1 − 10^{−12} + 1.12·10^{−16})(1 + u)(1 + 7.4·10^{−15})(1 + 1.34·10^{−13}) <
-1 − 8.5·10^{−13}. For x < −700, e^x < 10^{−300}. The last claim follows from e^{8·10^{−13}} ≤ 1 + 8.01·10^{−13},
-1 − y ≤ e^{−y}, and e^{−700+8·10^{−13}} < 10^{−300}. ∎ iexp([a,b]) := [lo(a), hi(b)]. The scalar inequalities of
-(A2)–(A4) and (A8) are re-checked in exact rationals by `certify_small.py` (C7) [C, exact].
-
-(A3) *Φ.* For a double x, `Phi_pt` returns lo ≤ Φ(x) ≤ hi. *Proof.* For z ≥ 0, Φ(z) − 1/2 = φ(z)S(z),
-S(z) := Σ_{n≥0} T_n, T_n := z^{2n+1}/(2n+1)!! (both sides vanish at 0 and have derivative φ(z): S′ = 1 + zS).
-Let a := |x| and H := φ(a)S(a) = Φ(a) − 1/2. *a > 7:* by Mills' inequality (∫_a^∞ φ ≤ ∫_a^∞(v/a)φ(v)dv),
-1/2 − H = Φ(−a) ≤ φ(7)/7 < 1.39·10^{−12} (checked by `check` with (A2), and by C5 exactly); the program uses
-[fl(0.5 − d), 0.5] with d the double nearest 1.4·10^{−12}, and fl(0.5 − d) ≤ 0.5 − 1.39·10^{−12}. *a ≤ 7:*
-x2 := fl(a²); the loop forms T̃_n := fl(fl(T̃_{n−1}·x2)/(2n+1)), T̃_0 = a, adds them with rounding into S̃, and stops
-at the first N ≥ 1 with x2 < (2N+3)/2 and T̃_N ≤ 10^{−17}S̃. As x2 < 49.01, the first test holds from n = 48
-on and the computed terms decrease by a factor < 0.4951 from n = 49 on (x2/(2n+1) ≤ 49.01/99); so N ≤ 104.
-T̃_n carries at most 3n roundings, the sum at most N more, all on nonnegative numbers; so S̃ = S_N(1 + θ),
-S_N := Σ_{n≤N}T_n, |θ| ≤ (1 + u)^{416} − 1 < 4.7·10^{−14}, up to an absolute error < 2^{−1066} from underflow
-(if a < 1 the factors x2/(2n+1) are < 1; if a ≥ 1 no term underflows).
-The tail Σ_{n>N}T_n ≤ T_N(q + q² + ⋯) with q = a²/(2N+3) ≤ x2(1 + u)/(2N+3) < (1 + u)/2, so it is ≤ (1 + 3u)T_N
-≤ 1.0001·10^{−17}S_N. The exponential is taken at the double −x2/2, within 24.5u + 2^{−1076} < 8·10^{−13} of
-−a²/2, so by (A2) el ≤ (1 − 8.47·10^{−13})e^{−a²/2} and eh ≥ (1 + 8.47·10^{−13})e^{−a²/2}; the two literals of
-1/√(2π) are the lower and upper ends of INVS2PI (C5); with the factors 1 ∓ 10^{−12} and three rounded products,
-H_lo ≤ (1 − 1.7·10^{−12})H + 2^{−1060} and H_hi ≥ (1 + 1.7·10^{−12})H − 2^{−1060}. If H ≥ 2^{−1020} this gives
-H_lo ≤ H ≤ H_hi, and the returned ends are dn(fl(0.5 + H_lo)), up(fl(0.5 + H_hi)) for x ≥ 0 and dn(fl(0.5 − H_hi)),
-up(fl(0.5 − H_lo)) for x < 0, which enclose Φ(x) by (A0). If H < 2^{−1020}, then H_lo, H_hi ∈ [0, 2^{−1019}], so
-all four rounded sums equal 0.5, and dn(0.5) = 0.5 − 2^{−54} < Φ(x) < up(0.5) = 0.5 + 2^{−53}. Clipping to [0, 1]
-and of H_lo, H_hi to ≤ 0.5 keeps the enclosure. ∎ iPhi([a,b]) := [lo(a), hi(b)].
-
-(A4) *cos.* For a double x ∈ [0, 3.2], |cosval(x) − cos x| < 1.4·10^{−13}: cosval sums the Taylor series to
-x^{48}/48! (Lagrange remainder ≤ x^{50}/50! < 10^{−39}); each term carries at most 72 roundings (relative error
-≤ 72.1u), and the 24 additions act on partial sums bounded by cosh 3.2 < 12.3; total < 12.3(72.1 + 24.1)u <
-1.4·10^{−13}. icos([a,b]), −10^{−9} ≤ a ≤ b ≤ 3.2, returns [fl(cosval(b) − 10^{−12}), fl(cosval(max(a,0)) +
-10^{−12})] clipped to [−1, 1], with lower end −1 if b is ≥ the double below π. This contains cos([a,b]) whenever
-b ≤ π/2 + 0.1 (cos is decreasing on [0, π] and 1 − cos(10^{−9}) < 10^{−18}; margin 10^{−12} − 1.4·10^{−13} − 2u).
-In the program a, b ∈ [−10^{−9}, 1.571] always (ψ ∈ [0, PI3_UP] and π/2 − ψ).
-
-(A5) *Taylor arithmetic.* A model on a double interval X is (c_0, …, c_4), intervals; the variable is (X, 1, 0,
-0, 0). The operations evaluate in interval arithmetic the recurrences that hold at every point ξ for the Taylor
-coefficients g_k := g^{(k)}(ξ)/k!: (fg)_k = Σ_{j≤k} f_jg_{k−j}; (f/g)_k = (f_k − Σ_{1≤j≤k} g_j(f/g)_{k−j})/g_0;
-(√f)_k = (f_k − Σ_{0<j<k}(√f)_j(√f)_{k−j})/(2(√f)_0); (e^f)_k = (1/k)Σ_{1≤j≤k} j f_j(e^f)_{k−j};
-(Φ∘f)_k = (1/k)Σ_{1≤j≤k} j f_j p_{k−j} with p the coefficients of φ∘f = (2π)^{−1/2}e^{−f²/2} (from
-(e^f)′ = f′e^f, (Φ∘f)′ = f′·φ∘f); and for cos ψ: c_k = cos^{(k)}(X)/k! from icos(X) and sin X = icos(π/2 − X).
-Replacing ξ by X keeps, by the inclusion property (A1)–(A4), c_k ∋ g^{(k)}(ξ)/k! for every ξ ∈ X: c_0 encloses the
-range of g on X and c_4 ∋ g⁗(ξ)/24.
-
-(A6) *Simpson.* On a panel [x_0, x_1] (doubles, h = x_1 − x_0 as an interval) `integ` encloses ∫g by h times an
-a-priori range of g (V only, (A7)), by h·c_0 and by
-(h/6)(g(x_0) + 4g(m) + g(x_1)) − (h⁵/120)c_4 (§1.0; h⁵/2880·g⁗ = (h⁵/120)·g⁗/24), with point enclosures of g at
-x_0, x_1 and at an interval containing m, and intersects them ((A0) abort if disjoint). Adjacent panels share their
-end doubles, so the sum is an enclosure of the integral over the union.
-
-(A7) *V̄.* For a ≤ b on one side of 0, V_up(a, b, 4) ≥ sup_{[a,b]} V: Lemma 5.3 with the integrand (≥ 0 and ≤ A ≤
-1/3) integrated over [0, PI3_UP] ⊇ [0, π/3] (PI3_UP is a double > π/3, `check`), its models built with t
-replaced by the interval [a,b] (so the c_k hold for every t ∈ [a,b]), 48 panels (A6), times an upper bound of 3/π
-(C5). For b ≤ 0 the term Φ(t) − Φ(c_0t) = (c_0 − 1)|t|φ(ξ) (ξ ∈ [c_0t, t], mean value theorem) is bounded by the
-smaller of (c_0 − 1)|a|φ(b) (φ(b) by (A2) at the double fl(−b²/2), within 0.64u of −b²/2) and the interval
-difference iPhi(t) − iPhi(c_0t). The leaf is cut into 4 sub-slabs with shared ends; the maximum is used.
-
-(A8) *K_lo ≤ K_a(u).* M, κ_u and κ_u/λ are enclosed by (A1). If a width exceeds 5·10^{−15} or x_m ≤ −7.9, the
-program returns 0 ≤ K. Otherwise x_m := dn(min of the lower ends) ≤ x* := min(M, κ_u/λ) and
-x* − x_m ≤ 5·10^{−15} + 2^{−50} < 10^{−14} (one ulp, as M ≤ 3a(1 − r_1) < 1 for u ≥ b ≥ a, and x_m > −7.9).
-On (−∞, x*), G_{a,u} = 2Φ(κ_u − λx) − 1 is smooth, and G_{a,u} = 0 beyond x*; so I_n is ∫_{−8}^{x_m}φĥ_nG plus
-the integral over R := (−∞, −8) ∪ (x_m, x*). The first is enclosed by 80 panels (A5, A6), ĥ_n by its recurrence
-in Taylor arithmetic. For the second, Cauchy–Schwarz with ∫φĥ_n² = 1 and 0 ≤ G ≤ 1 gives |∫_Rφĥ_nG| ≤ (∫_Rφ)^{1/2}
-≤ Φ(−8)^{1/2} + (0.4·10^{−14})^{1/2} ≤ 10^{−7} (Φ(−8) ≤ φ(8)/8 by Mills; `check`), so each I_n lies in its
-computed interval widened by 10^{−7}. By Lemma 5.5 (N = 20) K ≥ Σ_{n≤20}(−1/2)ⁿI_n² − 2^{−21}I_0; the program
-evaluates the sum in (A1) (isqr; 2^{−n} exact), takes its lower end, subtracts an upper bound of 2^{−21}I_0
-rounding down, and replaces a negative result by 0.
-
-(A9) *P̲2.* P2_lo(a,b) = Σ_j K_lo(a, u_{j+1})·m_j, each product and partial sum rounded down, with
-m_j := dn(Φ_lo(u_{j+1}) − Φ_hi(u_j)) ≤ Φ(u_{j+1}) − Φ(u_j) (A3), u_0 = b, u_{j+1} = fl(u_j + Δu_j), Δu_j =
-10^{−4}·1.002^j, while u_j − b < 1.2; terms with m_j ≤ 0 or K_lo = 0 are skipped. By Lemma 5.4 and (A8) this is
-≤ P2(a,b).
-
-(A10) *Leaf and tails.* The leaf bound is up(fl(V̄ + up(P3up(b)/2))) and, if needed, minus dn(fl(1.5·P̲2)) rounded
-up: by (A0) it is ≥ V̄ + P3up(b)/2 − (3/2)P̲2. P3up(b) is evaluated in (A1)–(A2) with the doubles 0.02434, 0.0589,
-whose inequalities `check` verifies in (A1). γ is the lower end of idiv(G, 10⁸) ≤ G/10⁸. `check` compares upper
-bounds (A3) of Φ(−1.125) and (7/2)Φ(−2) with γ. ∎
-
-**6.3 Parameters.** V̄: 48 Simpson panels on [0, PI3_UP], 4 sub-slabs per leaf. P̲2: Δu_0 = 10^{−4}, growth 1.002,
-u-range 1.2 (1612 nodes), N = 20 Hermite terms, 80 panels on [−8, x_m]. Near the maximum V̄ is sharp to about
-10^{−9} on thin slabs, and P̲2 is about 3.6·10^{−6} below P2, so the leaf bound loses about 5.5·10^{−6} at a point;
-on a full base slab of width 1/1024 near t = 0.04 it loses about 4.1·10^{−5} more (V̄ 1.1·10^{−5}, (3/2)P̲2
-3.0·10^{−5}); hence bisection is needed only where G_d exceeds about 0.13612 [S].
-
-**6.4 Run.** Compile with `gcc -O2 -std=c11 -ffp-contract=off -fno-fast-math -o edcert edcert.c -lm` and run
-
-    ./edcert full 13617000                  (one process)
-
-It checks the side conditions of §6.1(i), certifies the 3200 base slabs in increasing order, prints one line per
-slab, checks that the slabs are contiguous from −1.125 to 2, and ends with
-`RESULT: CERTIFIED for gamma = 13617000/10^8` (exit 0; otherwise `NOT certified`, exit 1). The same lines can be
-computed in parallel by `./edcert slab 13617000 1024 k0 k1` on disjoint ranges covering −1152 ≤ k < 2048 (exit 0
-iff every slab is OK), together with `./edcert check 13617000` (the side conditions); every line is deterministic and does not depend on the split. P̲2 is needed on the 486 base
-slabs inside [−0.169, 0.306], once per slab except near the maximum: about 630 evaluations of P̲2 (≈ 0.6 s each on
-one laptop core), so the run costs about 6–7 core-minutes on that machine and is dominated by P̲2.
-Recorded runs of the supplied file (gcc 13.3.0, aarch64 Linux): `./edcert full 13617000` in one process: 3200 base
-slabs, 3271 leaves, 628 P̲2 evaluations, largest certified bound 0.1361698539 (slab 32), last line
-`RESULT: CERTIFIED for gamma = 13617000/10^8`; the parallel procedure gave the same lines; `check`, `selftest`,
-`globsub`: OK. Negative control: `./edcert slab 13615000 1024 40 41` FAILS (exit 1), as it must (G_d(0.04) > 0.13615).
-
-**6.5 Independent cross-check** [C, weaker constant]. `certify_small.py` (Python standard library only, its own
-interval arithmetic and its own enclosures of exp and Φ, no library function in any bound) re-proves G_d(t) ≤ γ
-for all t with a different method: V̄ by left Riemann sums of the τ-form of Lemma 5.3 (whose integrand bound is
-monotone in τ, §5.3), and P̲2 without Mehler's formula, by a lower Riemann sum on a lattice in which x_2 =
-−x_1/2 + (√3/2)y with x_1, y independent (G_{a,u}(x_1) is nonincreasing in x_1, E_yG_{a,u}(x_2) nondecreasing in
-x_1, G_{a,u}(x_2) nonincreasing in y; on the lattice x_k = x_0 + k√3h, y_l = √3x_0 + lh, u_i = b + i(√6/5)h every
-H-argument is κ_b − λx_0 + J√2h, J ∈ Z, and every indicator is J ≥ cut_i, so the double sum is a running
-convolution). Results: γ = 0.1364 certified in 27 s, γ = 0.1366 in 15 s (one core). It also checks (C1), (C2),
-(C6), the witnesses of §7 (C4), the constants of `edcert.c` (C5) and the error budget of §6.2 (C7).
+Here γ_d = 34039/250000. Proposition C (§0: G_d(t) ≤ γ_d for every real t) is proved in `certificate.md`,
+the companion file of this one. It contains Theorem PL (log-concavity of Gaussian marginals) and Lemmas
+5.9–5.12, with their proofs, and in its §6.1–§6.6 the certificate itself: what is checked; the arithmetic; the
+lower bound of P4 = Φ − V; the lower bound of P2; the leaf bound, P3 and the tails; the run. The computation is
+the program `certify.py` (Python standard library only, its own outward-rounded
+interval arithmetic in the model of §1.0), which anyone can run in a few seconds. Its output object has the field
+`certified: true`, a cover of the whole real line (finitely many leaves and two tails) and the largest certified
+bound; `certificate.md` §6 proves that `certified: true` implies Proposition C. The labels [P], [C],
+[C, exact] and [S] are used there as in this file.
 
 ## 7. Proofs of Theorems 2 and 1
 
@@ -713,7 +572,7 @@ The first entry is the larger: 12Φ(−3) < 0.0178 < γ_d (N6) and 12λ_2 < λ_1
 cw(K) ≤ cw(σ) ≤ 30 + D(γ_d + K_d(R) + 21ε²) + 17.96D/(M−1) + 26.85·2^R√(MD). The left side does not depend on ε;
 let ε → 0. ∎
 
-**Proof of Theorem 1.** By (W4), cw(K) ≤ 3D/2 = γ_dD + (136383/100000)D always; this settles D < 2^40. Let
+**Proof of Theorem 1.** By (W4), cw(K) ≤ 3D/2 = γ_dD + (340961/250000)D always; this settles D < 2^40. Let
 D ≥ 2^40, Λ := log₂D ≥ 40, R := ⌊Λ/3⌋ − 1 ≥ 12 and M := ⌈D^{1/9}⌉ + 1. Then R + 1 > (Λ − 3)/3, so K_d(R) <
 9·106.41/(Λ−3)² < 958/(Λ−3)² (N5); 2^R ≤ 2^{Λ/3 − 1} = D^{1/3}/2; and D^{1/9} ≥ 2^{40/9} > 2 gives M ≤ D^{1/9} + 2
 ≤ 2D^{1/9}, M − 1 ≥ D^{1/9}. Hence 26.85·2^R√(MD) ≤ 26.85·(√2/2)·D^{1/3+1/18+1/2} < 18.99D^{8/9} (N3),
@@ -721,11 +580,11 @@ D ≥ 2^40, Λ := log₂D ≥ 40, R := ⌊Λ/3⌋ − 1 ≥ 12 and M := ⌈D^{1/
 38D^{8/9} (N4). Together with the trivial bound, cw(K) ≤ γ_dD + h_d(D).
 *Properties of h_d.* h_d ≥ 0. f(D) := 958D/(log₂D − 3)² + 38D^{8/9} is increasing on [2^40, ∞): the derivative of
 x/(log₂x − 3)² has the sign of (log₂x − 3) − 2/ln 2 > 0. A minimum of nondecreasing functions is nondecreasing,
-so h_d is nondecreasing on [1, 2^40) and on [2^40, ∞); at the junction f(2^40) > (136383/100000)·2^40 (N7), so
-h_d(2^40) = (136383/100000)·2^40 ≥ h_d(2^40 − 1). Finally h_d(D)/D ≤ 958/(log₂D − 3)² + 38D^{−1/9} → 0. ∎
+so h_d is nondecreasing on [1, 2^40) and on [2^40, ∞); at the junction f(2^40) > (340961/250000)·2^40 (N7), so
+h_d(2^40) = (340961/250000)·2^40 ≥ h_d(2^40 − 1). Finally h_d(D)/D ≤ 958/(log₂D − 3)² + 38D^{−1/9} → 0. ∎
 
 **Numerical witnesses** (exact rational comparisons after inserting the stated rational bounds;
-`certify_small.py` (C4) checks each with `fractions.Fraction`):
+`certify.py` (C4) checks each in exact rational arithmetic):
 - (N1) 1.41421² < 2 < 1.41422²; 3.3166² < 11; 9.7467² < 95; 3.14159 < π < 3.1416 (π enclosed by Machin's formula
   in exact rationals).
 - (N2) 6·1.41422 + 60/3.3166 + 19 + 216/9.7467 < 67.738 and 3.1416·67.738/2 < 106.41; for the ε² term,
@@ -736,5 +595,5 @@ h_d(2^40) = (136383/100000)·2^40 ≥ h_d(2^40 − 1). Finally h_d(D)/D ≤ 958/
 - (N5) 9·106.41 = 957.69 < 958.
 - (N6) e^{4.5} > Σ_{k<30} 4.5ᵏ/k! > 90 and 2.5066² < 2·3.14159, so 12Φ(−3) ≤ 4φ(3) < 4/(90·2.5066) < 0.0178 < γ_d
   (Φ(−T) ≤ φ(T)/T).
-- (N7) 2^40 < 22⁹, so 38·2^{−40/9} > 38/22 > 1.36383 = 3/2 − γ_d.
-- (N8) 1 + 1/(2γ_d) = 63617/13617 (used in `proof.md` §6.2).
+- (N7) 2^40 < 22⁹, so 38·2^{−40/9} > 38/22 > 1.363844 = 3/2 − γ_d.
+- (N8) 1 + 1/(2γ_d) = 159039/34039 (used in `proof.md` §6.2).
