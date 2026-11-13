@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""certify.py -- the certificate of Proposition C of cutwidth.md:  sup over all real t of G_d(t) <= 34039/250000.
+"""certify.py -- the certificate of Proposition C of cutwidth.md:  sup over all real t of G_d(t) <= 10637/78125.
 
 Declared experiment.  Python 3.12 standard library only; reads no file; input: one JSON value on stdin (ignored;
 `{}`); output: exactly one JSON object on stdout.  "certified": true is printed only if every check below passed.
@@ -45,7 +45,7 @@ from fractions import Fraction as Fr
 # an exact rational statement).  D("1.41421") is the exact rational 141421/100000; PI_Q = (lower, upper) are the
 # exact rational bounds of pi from Machin's formula computed below.
 D = Fr
-GAMMA_D = Fr(34039, 250000)                   # the target constant gamma_d of Proposition C (= 0.136156)
+GAMMA_D = Fr(10637, 78125)                    # the target constant gamma_d of Proposition C (= 0.1361536)
 
 def exp_partial(z, terms):                    # partial sum of the exponential series: < e^z for rational z > 0
     s, t = Fr(0), Fr(1)
@@ -82,20 +82,18 @@ WITNESSES = [
 
 # ---- GAMMA_WITNESSES: the statements of section 7 that DO depend on gamma_d (use GAMMA_D); same format.
 GAMMA_WITNESSES = [
-    ("N6 0.0178 < gamma_d = 34039/250000", lambda: D("0.0178") < GAMMA_D == Fr(34039, 250000)),
-    ("N7 38/22 > 340961/250000 = 3/2 - gamma_d and 2^40 < 22^9",
-     lambda: Fr(38, 22) > Fr(340961, 250000) == Fr(3, 2) - GAMMA_D and Fr(2) ** 40 < Fr(22) ** 9),
-    ("N8 1 + 1/(2 gamma_d) = 159039/34039 and 159039/34039 - 23361/5000 = 9921/170195000 > 0",
-     lambda: 1 + 1 / (2 * GAMMA_D) == Fr(159039, 34039)
-     and Fr(159039, 34039) - Fr(23361, 5000) == Fr(9921, 170195000) > 0),
+    ("N6 0.0178 < gamma_d = 10637/78125", lambda: D("0.0178") < GAMMA_D == Fr(10637, 78125)),
+    ("N7 38/22 > 213101/156250 = 3/2 - gamma_d and 2^40 < 22^9",
+     lambda: Fr(38, 22) > Fr(213101, 156250) == Fr(3, 2) - GAMMA_D and Fr(2) ** 40 < Fr(22) ** 9),
+    ("N8 1 + 1/(2 gamma_d) = 99399/21274", lambda: 1 + 1 / (2 * GAMMA_D) == Fr(99399, 21274)),
 ]
 # ============================================================================================================
 
 # ------------------------------------------------------------------ fixed parameters of (C3)
-T_EPS = 0.002                # eps of the triangle table (a binary64 number; treated as the exact real it is)
-T_HCHORD, T_HMAX = 2.75, 9.5 # chord rule for h <= T_HCHORD; table up to T_HMAX
-P2_LEVELS = ((0.1, 1, 2), (0.05, 1, 3), (0.025, 1, 3), (0.015625, 1, 3))   # (dv, a, b) of the P2 lattices, coarse to fine
-P2_VMAX, P2_ULEN = 4.0, 1.0
+T_EPS = 0.0015               # eps of the triangle table (a binary64 number; treated as the exact real it is)
+T_HCHORD, T_HMAX = 2.5, 6.5  # chord rule for h <= T_HCHORD; table up to T_HMAX
+P2_LEVELS = ((0.1, 1, 2), (0.04, 1, 3), (0.011, 1, 3))   # (dv, a, b) of the P2 lattices, coarse to fine
+P2_VMAX, P2_ULEN = 3.5, 0.8
 KDEN = 32                    # base intervals [k/32, (k+1)/32], -40 <= k < 64
 MAXDEPTH = 4                 # at most 4 bisections of a base interval
 T_LO, T_HI = -1.25, 2.0

@@ -1,8 +1,8 @@
-# Cutwidth of cubic multigraphs is at most (34039/250000)·D + h_d(D)
+# Cutwidth of cubic multigraphs is at most (10637/78125)·D + h_d(D)
 
 Status: one of the proof files (with `circuit.md`, `certificate.md` and `krs.md`). Theorem 1
-below is the hypothesis H(γ,h) of `circuit.md` §0 for γ = γ_d = 34039/250000 and the explicit h = h_d of §0;
-`proof.md` §6 combines this file with `circuit.md`. Proposition C (sup_t G_d(t) ≤ γ_d = 34039/250000) is proved
+below is the hypothesis H(γ,h) of `circuit.md` §0 for γ = γ_d = 10637/78125 and the explicit h = h_d of §0;
+`proof.md` §6 combines this file with `circuit.md`. Proposition C (sup_t G_d(t) ≤ γ_d = 10637/78125) is proved
 in `certificate.md` (see §6) and established by the program `certify.py` (Python
 standard library only, its own outward-rounded interval arithmetic), which anyone can run in a few seconds; its
 method and error analysis are in `certificate.md`, and its output object reports `certified: true` together with
@@ -34,9 +34,9 @@ v; K is **cubic** if every degree is 3. For P ⊆ V, **cut(P)** is the number of
 (loops never count). An ordering σ = (v_1, …, v_D) of V has cw(σ) := max_{1≤i<D} cut({v_1, …, v_i}) (0 if
 D = 1), and cw(K) := min_σ cw(σ). This is the convention of `circuit.md` Definition 4.3.
 
-    γ_d := 34039/250000 = 0.136156,
-    h_d(D) := (340961/250000)·D                                       for 1 ≤ D < 2^40,
-    h_d(D) := min{ (340961/250000)·D,  958·D/(log₂D − 3)² + 38·D^{8/9} }   for D ≥ 2^40.
+    γ_d := 10637/78125 = 0.1361536,
+    h_d(D) := (213101/156250)·D                                       for 1 ≤ D < 2^40,
+    h_d(D) := min{ (213101/156250)·D,  958·D/(log₂D − 3)² + 38·D^{8/9} }   for D ≥ 2^40.
 
 **Theorem 1** [P + C]. Every cubic multigraph K on D vertices (connected or not; loops and parallel edges
 allowed) satisfies cw(K) ≤ γ_d·D + h_d(D). The function h_d is nonnegative and nondecreasing on the positive
@@ -51,7 +51,7 @@ V, P2, P3 are probabilities of three events for one explicit Gaussian vector on 
 (§5.1–§5.2). Equivalently G_d = Φ − P4 − (3/2)P2 + P3/2 with P4 = Φ − V.
 
 [S] Floating-point quadrature gives max_t G_d(t) ≈ 0.1361516 at t ≈ 0.0404 (two independent quadratures), a
-margin of about 4·10⁻⁶ below γ_d; the largest bound certified by `certify.py` is reported in its output
+margin of about 2·10⁻⁶ below γ_d; the largest bound certified by `certify.py` is reported in its output
 (`certificate.md` §6).
 
 **Plan.** §1 preliminaries (walks, the universal cover, deck transformations). §2 the field and the lifting lemma;
@@ -496,7 +496,7 @@ for t ∈ [a, b]: W(t) ≥ 3P̲2 − P3up(b) (P3up := 0 for b ≤ 0), and G_d(t)
 
 ## 6. The certificate (Proposition C)
 
-Here γ_d = 34039/250000. Proposition C (§0: G_d(t) ≤ γ_d for every real t) is proved in `certificate.md`,
+Here γ_d = 10637/78125. Proposition C (§0: G_d(t) ≤ γ_d for every real t) is proved in `certificate.md`,
 the companion file of this one. It contains Theorem PL (log-concavity of Gaussian marginals) and Lemmas
 5.9–5.12, with their proofs, and in its §6.1–§6.6 the certificate itself: what is checked; the arithmetic; the
 lower bound of P4 = Φ − V; the lower bound of P2; the leaf bound, P3 and the tails; the run. The computation is
@@ -572,7 +572,7 @@ The first entry is the larger: 12Φ(−3) < 0.0178 < γ_d (N6) and 12λ_2 < λ_1
 cw(K) ≤ cw(σ) ≤ 30 + D(γ_d + K_d(R) + 21ε²) + 17.96D/(M−1) + 26.85·2^R√(MD). The left side does not depend on ε;
 let ε → 0. ∎
 
-**Proof of Theorem 1.** By (W4), cw(K) ≤ 3D/2 = γ_dD + (340961/250000)D always; this settles D < 2^40. Let
+**Proof of Theorem 1.** By (W4), cw(K) ≤ 3D/2 = γ_dD + (213101/156250)D always; this settles D < 2^40. Let
 D ≥ 2^40, Λ := log₂D ≥ 40, R := ⌊Λ/3⌋ − 1 ≥ 12 and M := ⌈D^{1/9}⌉ + 1. Then R + 1 > (Λ − 3)/3, so K_d(R) <
 9·106.41/(Λ−3)² < 958/(Λ−3)² (N5); 2^R ≤ 2^{Λ/3 − 1} = D^{1/3}/2; and D^{1/9} ≥ 2^{40/9} > 2 gives M ≤ D^{1/9} + 2
 ≤ 2D^{1/9}, M − 1 ≥ D^{1/9}. Hence 26.85·2^R√(MD) ≤ 26.85·(√2/2)·D^{1/3+1/18+1/2} < 18.99D^{8/9} (N3),
@@ -580,8 +580,8 @@ D ≥ 2^40, Λ := log₂D ≥ 40, R := ⌊Λ/3⌋ − 1 ≥ 12 and M := ⌈D^{1/
 38D^{8/9} (N4). Together with the trivial bound, cw(K) ≤ γ_dD + h_d(D).
 *Properties of h_d.* h_d ≥ 0. f(D) := 958D/(log₂D − 3)² + 38D^{8/9} is increasing on [2^40, ∞): the derivative of
 x/(log₂x − 3)² has the sign of (log₂x − 3) − 2/ln 2 > 0. A minimum of nondecreasing functions is nondecreasing,
-so h_d is nondecreasing on [1, 2^40) and on [2^40, ∞); at the junction f(2^40) > (340961/250000)·2^40 (N7), so
-h_d(2^40) = (340961/250000)·2^40 ≥ h_d(2^40 − 1). Finally h_d(D)/D ≤ 958/(log₂D − 3)² + 38D^{−1/9} → 0. ∎
+so h_d is nondecreasing on [1, 2^40) and on [2^40, ∞); at the junction f(2^40) > (213101/156250)·2^40 (N7), so
+h_d(2^40) = (213101/156250)·2^40 ≥ h_d(2^40 − 1). Finally h_d(D)/D ≤ 958/(log₂D − 3)² + 38D^{−1/9} → 0. ∎
 
 **Numerical witnesses** (exact rational comparisons after inserting the stated rational bounds;
 `certify.py` (C4) checks each in exact rational arithmetic):
@@ -595,5 +595,5 @@ h_d(2^40) = (340961/250000)·2^40 ≥ h_d(2^40 − 1). Finally h_d(D)/D ≤ 958/
 - (N5) 9·106.41 = 957.69 < 958.
 - (N6) e^{4.5} > Σ_{k<30} 4.5ᵏ/k! > 90 and 2.5066² < 2·3.14159, so 12Φ(−3) ≤ 4φ(3) < 4/(90·2.5066) < 0.0178 < γ_d
   (Φ(−T) ≤ φ(T)/T).
-- (N7) 2^40 < 22⁹, so 38·2^{−40/9} > 38/22 > 1.363844 = 3/2 − γ_d.
-- (N8) 1 + 1/(2γ_d) = 159039/34039 (used in `proof.md` §6.2).
+- (N7) 2^40 < 22⁹, so 38·2^{−40/9} > 38/22 > 1.3638464 = 213101/156250 = 3/2 − γ_d.
+- (N8) 1 + 1/(2γ_d) = 99399/21274 (used in `proof.md` §6.2).

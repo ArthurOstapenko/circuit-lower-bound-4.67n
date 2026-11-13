@@ -1,8 +1,8 @@
-# The certificate of Proposition C: sup_t G_d(t) <= 34039/250000
+# The certificate of Proposition C: sup_t G_d(t) <= 10637/78125
 
 **Status.** This file is the companion of `cutwidth.md` for its Proposition C. It proves: *if the output of the
 program `certify.py` (which runs in a few seconds) has "certified": true, then
-G_d(t) ≤ γ_d := 34039/250000 for every real t.* Labels as in `cutwidth.md`: [P] = proved here from undergraduate
+G_d(t) ≤ γ_d := 10637/78125 for every real t.* Labels as in `cutwidth.md`: [P] = proved here from undergraduate
 analysis and probability (§1.0 of `cutwidth.md`) and the items of `cutwidth.md` named below; [C] = checked by
 `certify`; [S] = not used in any proof.
 
@@ -159,7 +159,7 @@ positive on the box, and there log H(affine) is concave because H is positive an
 
 ## 6. The certificate (Proposition C)
 
-Here γ_d = 34039/250000. The program `certify.py` (Python standard library, reads
+Here γ_d = 10637/78125. The program `certify.py` (Python standard library, reads
 no file) checks finitely many instances of Lemma 5.9(c) and the tails of Lemma 5.7. This section proves: *if its
 output has "certified": true, then G_d(t) ≤ γ_d for all real t* (Proposition C). Function names: `certify.py`.
 
@@ -170,7 +170,7 @@ head of `certify.py`) hold; an exception gives "certified": false.
 t ≤ −5/4 and G_d(t) ≤ (7/2)Φ(−t) ≤ (7/2)Φ(−2) for t ≥ 2.
 (ii) *Leaves.* Each base interval [k/32, (k+1)/32], −40 ≤ k < 64, is bisected (at most 4 times; all ends are dyadic
 rationals with denominator ≤ 2⁹, exact in binary64; the program re-checks 2m = a + b and w = b − a in rationals)
-until each leaf [a, b] is accepted. For a leaf and a lattice level ℓ ∈ {0, 1, 2, 3} the program computes binary64
+until each leaf [a, b] is accepted. For a leaf and a lattice level ℓ ∈ {0, 1, 2} the program computes binary64
 numbers p_a ≤ P4(a), p_b ≤ P4(b) (6.3) and p′_a ≤ P2(a), p′_b ≤ P2(b) (6.4, lattice ℓ) and a binary64 number U
 that is ≥ the smaller of the right sides of (5.3) and (5.2) (6.5). The leaf is accepted at the first ℓ with U ≤ γ_d,
 compared exactly (`Fraction(U) <= GAMMA_D`). No leaf straddles 0. By Lemma 5.9(c), G_d ≤ U ≤ γ_d on every accepted
@@ -261,8 +261,8 @@ and up adds at least one such spacing). For y < 0 it returns the negative of the
 (q − p)/(q + p); if x ⊄ [−1/2, 1/2] the function returns None (then only (5.3), or (5.2) with min(p′, q′), 0, is
 used); otherwise, atanh being increasing, it returns (2·lower end of atanh_iv(x_lo), 2·upper end of atanh_iv(x_hi)).
 
-**6.3 P̲4** (`TriTable`, `TriTable.P4_lo(t)`) [P]. Let ε = 0.002 (the double), ω := √3ε, h_m := mω (0 ≤ m ≤ M,
-M = ⌊9.5/ω̄⌋, ω̄ the upper end of the enclosure of ω), z_k := kω, M_1 := ⌊2.75/ω̄⌋.
+**6.3 P̲4** (`TriTable`, `TriTable.P4_lo(t)`) [P]. Let ε = 0.0015 (the double), ω := √3ε, h_m := mω (0 ≤ m ≤ M,
+M = ⌊6.5/ω̄⌋, ω̄ the upper end of the enclosure of ω), z_k := kω, M_1 := ⌊2.5/ω̄⌋.
 (a) *Table: T̲_m ≤ T(h_m).* T̲_0 := 0 = T(0). For 1 ≤ m ≤ M, by Lemma 5.11(a),
 T(h_m) = Σ_{k=−2m}^{m−1} ∫_{z_k}^{z_{k+1}} φ(z)H((z + 2h_m)/√3)dz, and on the k-th cell the argument (z + 2h_m)/√3
 runs through [jε, (j+1)ε], j := k + 2m ≥ 0. H is concave on [0, ∞) (Lemma 5.11(c)), so it lies above its chord:
@@ -298,9 +298,9 @@ a sum of nonnegative bounds (≤ M + 2 roundings).
 dn(T̲_M·(lower end of Φ at the lower end of the enclosure of u_M)).
 `P4_lo(t)` returns dn of the sum of (c) and (d): a lower bound of P4(t). ∎
 
-**6.4 P̲2** (`P2Lattice(dv, a, b)`, `P2Lattice.lower(t)`) [P]. Four lattices ("levels") are used, with
-(Δ_v, a, b) = (0.1, 1, 2), (0.05, 1, 3), (0.025, 1, 3), (0.015625, 1, 3) (Δ_v a double, a, b positive integers). Put
-e := λΔ_v/b, Δ_u := ae/√3 = (a/b)r_1Δ_v, n_v := ⌊4/Δ_v⌋, n_u := ⌊1/Δ̄_u⌋ (Δ̄_u the upper end of the enclosure), and
+**6.4 P̲2** (`P2Lattice(dv, a, b)`, `P2Lattice.lower(t)`) [P]. Three lattices ("levels") are used, with
+(Δ_v, a, b) = (0.1, 1, 2), (0.04, 1, 3), (0.011, 1, 3) (Δ_v a double, a, b positive integers). Put
+e := λΔ_v/b, Δ_u := ae/√3 = (a/b)r_1Δ_v, n_v := ⌊3.5/Δ_v⌋, n_u := ⌊0.8/Δ̄_u⌋ (Δ̄_u the upper end of the enclosure), and
 
     u_i := t + iΔ_u (0 ≤ i ≤ n_u),   v_j := jΔ_v (0 ≤ j ≤ n_v),   M_i := 3(t − r_1u_i).
 
@@ -361,11 +361,11 @@ base intervals and leaves, contiguity; "counts": number of points at which P̲4 
 the table and lattice sizes; "largest_certified_bound", "argmax_interval": the largest U (rounded up), its leaf;
 "leaves_by_method": number of leaves accepted at each level; "block_table": leaves and largest U per block of
 length 1/4; "leaf_table": 60 consecutive leaves [a, b, U rounded up, level] around the largest.
-Recorded run (Python 3.12.13, one core, about 2.5 s; the run is deterministic): certified true; tails 0.105649774
-and 0.079625462; 104 base intervals, 112 leaves, contiguous; P̲4 at 113 points (ε = 0.002, M = 2742, M_1 = 793);
-P̲2 at 113, 13, 11, 10 points on the four levels (n_v = 40, 80, 160, 256; n_u = 21, 63, 127, 203); leaves by level
-100, 4, 3, 5; largest U = 0.136154913 on [5/128, 11/256]; all of C1–C6 ok; output 4831 bytes. [S] The maximum
-of G_d is about 0.1361516 (near t = 0.0404). If only the line `GAMMA_D = Fr(34039, 250000)` is changed to
-2723/20000 = 0.13615 or to 1361/10000, the run is not certified: (C3) fails ("failed_leaf" [1/32, 17/512] with
-U = 0.136150724, resp. [3/256, 7/512] with U = 0.136103398), and (C4) fails as well, its three γ-dependent
-witnesses being stated for 34039/250000.
+Recorded run (Python 3.12.13, one core, about 3.6 s; the run is deterministic): certified true; tails 0.105649774
+and 0.079625462; 104 base intervals, 114 leaves, contiguous; P̲4 at 115 points (ε = 0.0015, M = 2501, M_1 = 962);
+P̲2 at 115, 15, 13 points on the three levels (n_v = 35, 87, 318; n_u = 16, 63, 231); leaves by level
+100, 5, 9; largest U = 0.136153400 on [3/64, 7/128]; all of C1–C6 ok; output 4767 bytes. [S] The maximum
+of G_d is about 0.1361516 (near t = 0.0404). If only the line `GAMMA_D = Fr(10637, 78125)` is changed to
+2723/20000 = 0.13615 or to 1361/10000, the run is not certified: (C3) fails ("failed_leaf" [17/512, 9/256] with
+U = 0.136151287, resp. [3/256, 7/512] with U = 0.136102200), and (C4) fails as well, its three γ-dependent
+witnesses being stated for 10637/78125.

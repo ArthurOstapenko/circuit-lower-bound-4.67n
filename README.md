@@ -1,7 +1,7 @@
 # An explicit function that needs more than 4.67n gates
 
 This repository contains a proof that an explicit Boolean function in P requires circuits of size at least
-(4.6722 − o(1))·n over the full binary basis, together with the short program that certifies the one numerical
+(4.6723 − o(1))·n over the full binary basis, together with the short program that certifies the one numerical
 step of the proof.
 
 Author: Arthur Ostapenko, November 2026.
@@ -27,17 +27,21 @@ a function in NP would give P ≠ NP. What is actually known is a small constant
 | 2026 | 4n − O(log n) | Mishra, Santhanam | gate elimination |
 | 2026 | (4.5624 − ε)n | McGuire, Schlesinger, Williams | cutwidth of the circuit's wire graph |
 | 2026 | (4.6155 − ε)n | McGuire, Schlesinger, Williams | same, with a computer-assisted cutwidth bound (see their repository) |
-| 2026 | **(4.6722 − ε)n** | this repository | same route, better cutwidth bound |
+| 2026 | **(4.6723 − ε)n** | this repository | same route, better cutwidth bound |
 
 So the constant is still far from anything that separates complexity classes. It is, however, the place where
 the difficulty of the problem can be measured, and each new technique that moves it is worth understanding.
 
 ## The result
 
-**Theorem.** There is an explicit language L in P such that for every ε > 0 and every sufficiently large input
-length N, every B2 circuit deciding L on inputs of length N has at least (23361/5000 − ε)·N gates.
+**Theorem.** There is an explicit language L in P such that for every input length N ≥ 2^200, every B2 circuit
+deciding L on inputs of length N has at least
 
-More precisely, C(L_N) ≥ c·N − R(N) with c = 159039/34039 = 4.67225… and an explicit remainder R(N) = O(N/log² N).
+    (99399/21274)·N − 35190.1·N/(log₂ N)²
+
+gates. Here 99399/21274 = 4.67232…, so for every ε > 0 and every sufficiently large N the size is at least
+(4.6723 − ε)·N.
+
 The function is the indicator of "the norm of z equals 1" for an element z of a finite field of characteristic 2,
 where the polynomials defining the field are part of the input and are validated by the function itself. It is
 defined at every input length.
@@ -63,7 +67,7 @@ gates. It measures how much information has to cross a cut of the circuit.
    then steps 1–3 give s ≥ (1 + 1/(2γ))·n − o(n). The trivial value γ = 1/6 gives exactly 4n. McGuire,
    Schlesinger and Williams prove γ ≤ 0.14035, which gives 4.5624n, and with a computer-assisted argument
    γ ≤ 0.13830, which gives 4.6155n.
-5. **Cutwidth of cubic graphs — the new part.** We prove γ ≤ 0.136156.
+5. **Cutwidth of cubic graphs — the new part.** We prove γ ≤ 0.1361536.
    - Give every vertex a Gaussian label that is correlated along non-backtracking walks, and order the vertices
      by label. This is the starting point of the earlier work (also Gaspers, 2026).
    - Improve the order locally, twice: first raise each label to the median of its neighbours' labels when that
@@ -76,7 +80,7 @@ gates. It measures how much information has to cross a cut of the circuit.
      infinite 3-regular tree is the worst case, because every other graph has larger correlations.
    - On the tree the bound becomes an explicit function G(t) of the threshold, a combination of three Gaussian
      probabilities. Its maximum is about 0.1361516, near t = 0.04.
-6. **The numerical step.** A short Python program proves G(t) ≤ 0.136156 for every real t, with interval
+6. **The numerical step.** A short Python program proves G(t) ≤ 0.1361536 for every real t, with interval
    arithmetic that it implements itself.
    - Two of the three probabilities are probabilities that a Gaussian vector lies in a convex set that moves
      linearly with t. Such functions are log-concave in t (Prékopa–Leindler). So lower bounds at the two ends
@@ -84,7 +88,7 @@ gates. It measures how much information has to cross a cut of the circuit.
    - Each probability is an integral of a function of the form e^(−q)·g with g log-concave. On a box such an
      integral is at least the volume times the geometric mean of the corner values times an explicit factor.
      This is second order and has no error term.
-   - The real line is covered by two analytic tails and 112 intervals. Every interval bound is compared with
+   - The real line is covered by two analytic tails and 114 intervals. Every interval bound is compared with
      the target in exact rational arithmetic.
 
 ## What is new here, and what is not
@@ -112,9 +116,9 @@ the whole chain for a different explicit function, with an explicit remainder te
 - The program's lower bounds were compared with direct quadrature and with a Monte Carlo simulation from the
   definition (24 million samples). They are below the true values everywhere, by about 10^-6 near the maximum.
 - An automated proof reviewer, which runs the program itself in a sandbox and reads all files, accepted this
-  version and two weaker earlier versions (constants 4.5624 and 4.66).
+  version and four weaker earlier versions (constants 4.5624, 4.66, 4.6722 and 4.67226).
 - **Not done:** review by a human expert and formal verification. The margin of the certificate is small
-  (the largest interval bound is 0.136154913 against the target 0.136156), and the new parts were written
+  (the largest interval bound is 0.136153400 against the target 0.1361536), and the new parts were written
   within one day.
 
 ## Repository layout
@@ -127,12 +131,12 @@ the whole chain for a different explicit function, with an explicit remainder te
     krs.md            the norm-graph theorem with a complete proof
     earlier/          the first version of step 5 (γ ≤ 0.1375, constant 51/11 ≈ 4.636) with a certificate in C
 
-To run the certificate (two to three seconds):
+To run the certificate (about four seconds):
 
     echo '{}' | python3 certify.py
 
 It prints one JSON object. The fields to look at are `certified` (must be `true`), `cover` (104 base intervals,
-112 leaves, contiguous from −5/4 to 2) and `largest_certified_bound` (0.136154913). If the target in the first
+114 leaves, contiguous from −5/4 to 2) and `largest_certified_bound` (0.136153400). If the target in the first
 lines of the program is lowered to 0.13615, below the true maximum, the program reports a failed interval.
 
 ## Where this could go next
