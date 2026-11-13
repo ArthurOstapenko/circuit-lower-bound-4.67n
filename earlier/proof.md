@@ -243,6 +243,8 @@ which gives the Main Theorem with coefficient 1159/250.
   preprint, November 2026. The authors' Lean 4 formalization: github.com/SamuelSchlesinger/circuit-lb-4.56n-lean
   (commit b7c27d13c0545dedd78ec2614ca6792df160e8ed, 2026-10-13). Credit for the circuit-to-cutwidth route and the
   Gaussian ordering of cubic graphs; not a premise.
+  The same authors also give a computer-assisted proof of the cutwidth constant 0.13830 (in the normalisation
+  used here), that is (4.6155 − ε)n: github.com/rrwilliams0/circuit-lb-4.6155n. It is not used here.
 * S. Gaspers, arXiv:2611.05146v1 (preprint, November 2026): Gaussian threshold orderings of cubic graphs. Credit;
   not used.
 * J. Kollár, L. Rónyai, T. Szabó, "Norm-graphs and bipartite Turán numbers", Combinatorica 16(3) (1996)

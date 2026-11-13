@@ -7,7 +7,8 @@ exhaustive check of Lemma 4.4) and `certify_small.py` (an independent pure-Pytho
 the witnesses of §7 and of a weaker form of Proposition C, §6.5).
 
 **Credit.** The route from cutwidth bounds to circuit lower bounds is due to S. McGuire, S. Schlesinger and
-R. Williams (preprint, November 2026). Ordering the vertices of a cubic graph by thresholds of a Gaussian field
+R. Williams (preprint, November 2026). Their best constant, in the normalisation used here, is 0.14035 by hand
+and 0.13830 with a computer-assisted argument. Ordering the vertices of a cubic graph by thresholds of a Gaussian field
 goes back to that preprint and to S. Gaspers (arXiv:2611.05146). New here: the comparison of the field on any
 cubic multigraph with the field on the 3-regular tree for local energies whose *formal sum over the tree* is
 submodular, although the local terms are not (Theorem 3.3), and the post-processing of the level sets by the set
