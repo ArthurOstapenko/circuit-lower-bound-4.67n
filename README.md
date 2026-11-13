@@ -21,10 +21,11 @@ a function in NP would give P ≠ NP. What is actually known is a small constant
 | year | bound | authors | method |
 |---|---|---|---|
 | 1984 | 3n − o(n) | Blum | gate elimination |
-| 2016 | 3.011n | Find, Golovnev, Hirsch, Kulikov | gate elimination |
+| 2016 | (3 + 1/86)n − o(n) | Find, Golovnev, Hirsch, Kulikov | gate elimination |
 | 2022 | 3.1n − o(n) | Li, Yang | gate elimination |
 | 2026 | 4n − O(log n) | Mishra, Santhanam | gate elimination |
 | 2026 | (4.5624 − ε)n | McGuire, Schlesinger, Williams | cutwidth of the circuit's wire graph |
+| 2026 | (4.6155 − ε)n | McGuire, Schlesinger, Williams | same, with a computer-assisted cutwidth bound (see their repository) |
 | 2026 | **(4.6718 − ε)n** | this repository | same route, better cutwidth bound |
 
 So the constant is still far from anything that separates complexity classes. It is, however, the place where
@@ -59,7 +60,8 @@ gates. It measures how much information has to cross a cut of the circuit.
    a theorem of Kollár, Rónyai and Szabó on norm graphs (1996).
 4. **Arithmetic.** If every cubic multigraph on D vertices has an ordering of cutwidth at most (γ + o(1))·D,
    then steps 1–3 give s ≥ (1 + 1/(2γ))·n − o(n). The trivial value γ = 1/6 gives exactly 4n. McGuire,
-   Schlesinger and Williams prove γ ≤ 0.14035, which gives 4.5624n.
+   Schlesinger and Williams prove γ ≤ 0.14035, which gives 4.5624n, and with a computer-assisted argument
+   γ ≤ 0.13830, which gives 4.6155n.
 5. **Cutwidth of cubic graphs — the new part.** We prove γ ≤ 0.13617.
    - Give every vertex a Gaussian label that is correlated along non-backtracking walks, and order the vertices
      by label. This is the starting point of the earlier work (also Gaspers, 2026).
@@ -120,7 +122,7 @@ To run the certificate (about 11 minutes on one core):
 - **Better cutwidth constant.** The exact cut (instead of the energy with weight 1/2) would give γ ≈ 0.1323,
   that is about 4.78n, if the comparison with the tree could be proved for it. Numerically it holds. More rounds
   of local improvement give a little more.
-- **Limit of the route.** Random cubic graphs have bisection width at least 0.1033·D (Lichev, Mitsche), so no
+- **Limit of the route.** Random cubic graphs have bisection width at least 0.10329·D (Lichev, Mitsche), so no
   cutwidth bound can take this argument beyond about 5.84n.
 - **Beyond wires.** The branching program remembers one bit per crossing wire. Counting the information that
   actually has to cross, rather than the wires, is not limited by the cutwidth of cubic graphs. We do not know how
@@ -130,17 +132,20 @@ To run the certificate (about 11 minutes on one core):
 
 ## References
 
-- N. Blum, A Boolean function requiring 3n network size, Theoret. Comput. Sci. 28 (1984).
-- M. Find, A. Golovnev, E. Hirsch, A. Kulikov, A better-than-3n lower bound for the circuit complexity of an
-  explicit function, FOCS 2016.
+- C. E. Shannon, The synthesis of two-terminal switching circuits, Bell System Tech. J. 28 (1949), 59–98.
+- N. Blum, A Boolean function requiring 3n network size, Theoret. Comput. Sci. 28 (1984), 337–345.
+- M. G. Find, A. Golovnev, E. A. Hirsch, A. S. Kulikov, A better-than-3n lower bound for the circuit complexity
+  of an explicit function, FOCS 2016.
 - J. Li, T. Yang, 3.1n − o(n) circuit lower bounds for explicit functions, STOC 2022.
-- S. Mishra, R. Santhanam, An explicit 4n − O(log n) size lower bound against general Boolean circuits,
-  ECCC TR26-260 (revision 1, 2026).
+- O. S. Mishra, R. Santhanam, An explicit 4n − O(log n) size lower bound against general Boolean circuits,
+  ECCC TR26-260, revision 1 (3 November 2026).
 - S. McGuire, S. Schlesinger, R. Williams, Explicit functions requiring larger than 4.5n size circuits,
-  preprint, November 2026.
-- S. Gaspers, arXiv:2611.05146 (2026).
-- J. Kollár, L. Rónyai, T. Szabó, Norm-graphs and bipartite Turán numbers, Combinatorica 16 (1996).
-- L. Lichev, D. Mitsche, On the minimum bisection of random 3-regular graphs, Electron. J. Combin. 30(2) (2023).
+  preprint, November 2026. The (4.6155 − ε)n bound: https://github.com/rrwilliams0/circuit-lb-4.6155n
+- S. Gaspers, Path decompositions of sparse graphs via Gaussian sweeps and faster exponential algorithms,
+  arXiv:2611.05146 (2026).
+- J. Kollár, L. Rónyai, T. Szabó, Norm-graphs and bipartite Turán numbers, Combinatorica 16(3) (1996), 399–406.
+- L. Lichev, D. Mitsche, On the minimum bisection of random 3-regular graphs, Electron. J. Combin. 30(2) (2023),
+  P2.40.
 
 ## License
 
