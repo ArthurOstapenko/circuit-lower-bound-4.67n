@@ -1,4 +1,4 @@
-# A (99399/21274)·N − O(N/log² N) circuit lower bound: a validated-field family and a cutwidth argument
+# A 4.67235·N − O(N/log² N) circuit lower bound: a validated-field family and a cutwidth argument
 
 ## Claim
 
@@ -9,24 +9,28 @@ Let L be the single total language defined in §1, A its evaluator and L_N its s
 NP with witness bound W(N) = 0 and the fixed verifier V that accepts (x, w) iff w is empty and A(x) = 1. In the
 full B2 model, with N the entire input length: for every integer N >= 2^200,
 
-    C_B2(L_N) >= (99399/21274)·N − (351901/10)·N/(log2 N)²                    (351901/10 = 35190.1).
+    C_B2(L_N) >= (11459905344586199/2452706089845207)·N − K·N/(log2 N)²,
+    K = 287704960015153634328733/8175686966150690000 = 35190.31014…
 
-**Corollary.** Liminf over all integers N of C_B2(L_N)/N >= 99399/21274; equivalently, for every real ε > 0
-there is N_ε such that C_B2(L_N) >= (99399/21274 − ε)·N for every integer N >= N_ε.
+**Corollary.** Liminf over all integers N of C_B2(L_N)/N >= 11459905344586199/2452706089845207; equivalently,
+for every real ε > 0 there is N_ε such that C_B2(L_N) >= (11459905344586199/2452706089845207 − ε)·N for
+every integer N >= N_ε.
 
 **Route.** Put
 
-    γ_d = 10637/78125,   c* = 1 + 1/(2γ_d) = 99399/21274 = 4.67232…
+    γ_d = 2452706089845207/2^54 = 0.13615253867…,   c* = 1 + 1/(2γ_d) = 11459905344586199/2452706089845207 = 4.67235164…
 
 We prove that for every integer N >= 256
 
     C_B2(L_N) >= c*·N − R(N),                                                         (★)
 
-with the explicit remainder R(N) of §6.1, and that R(N) < K·N/(log2 N)² with K = 351901/10 for every
-N >= 2^200 (§6.3); the Main Theorem follows with N_0 = 2^200, and the Corollary with
+with the explicit remainder R(N) of §6.1, and that R(N) < K·N/(log2 N)² with K = (c* − 1)·9582.5001 + 0.0001
+(the value displayed in the Main Theorem) for every N >= 2^200 (§6.3); the Main Theorem follows with
+N_0 = 2^200, and the Corollary with
 N_ε = 2^max(200, ⌈√(K/ε)⌉) (§6.4). The result is this eventual lower bound: leading coefficient
-**c* = 99399/21274 (= 4.67232…), exponent 1** (§6.2), explicit remainder **K·N/(log2 N)², K = 351901/10**, at
-every integer N >= N_0 = 2^200.
+**c* = 11459905344586199/2452706089845207 (= 4.67235164…), exponent 1** (§6.2), explicit remainder
+**K·N/(log2 N)², K = 287704960015153634328733/8175686966150690000 (= 35190.31014…)**, at every integer
+N >= N_0 = 2^200.
 
 **Attribution.**
 * **Method.** The route circuit -> wire graph -> cutwidth ordering -> read-once nondeterministic program ->
@@ -35,7 +39,7 @@ every integer N >= N_0 = 2^200.
   function is a sumset extractor of Li. Ordering the vertices of a cubic graph by thresholds of a Gaussian field is
   due to that preprint and to S. Gaspers (arXiv:2611.05146). These sources are credited, not used as premises:
   every step is re-proved in `circuit.md`, `cutwidth.md` and `certificate.md`.
-* **Cutwidth constant.** The bound cw <= (10637/78125)·D + h_d(D) is proved in `cutwidth.md`. Two of its
+* **Cutwidth constant.** The bound cw <= (2452706089845207/2^54)·D + h_d(D) is proved in `cutwidth.md`. Two of its
   ingredients are new here: the comparison of a non-backtracking-walk Gaussian field on any cubic multigraph with
   the same field on the 3-regular tree, for local functionals of the threshold pattern whose formal sum over the
   tree is submodular although the single local terms are not (`cutwidth.md` Theorem 3.3 and Lemma 4.4), and a
@@ -53,8 +57,9 @@ every integer N >= N_0 = 2^200.
   explicit remainder, so the final remainder is explicit.
 
 **The numerical step.** There is exactly one program, `certify.py` (Python standard library only, its own outward-rounded interval
-arithmetic); it runs in a few seconds (pure Python). It establishes
-`cutwidth.md` Proposition C (sup_t G_d(t) <= γ_d = 10637/78125), the only step of the proof that rests on a
+arithmetic; `math.sqrt` serves only as the start value of two verified square-root loops); it runs in a
+few seconds (pure Python). It establishes
+`cutwidth.md` Proposition C (sup_t G_d(t) <= γ_d = 2452706089845207/2^54), the only step of the proof that rests on a
 computation; its method and error analysis are in `certificate.md` (§6 there), and its output object reports
 `certified: true` together with the cover and the largest certified bound. The same program re-checks by
 exhaustive enumeration the finite facts (C1) window energy, (C2) tree vector and (C6) global submodularity of
@@ -139,14 +144,14 @@ Every gate is counted once; inputs, wires and output selection cost nothing. The
   lower bound for read-once programs (Lemmas 3.1–3.2, Theorem 3.3); wire graph and sweep program (Lemma 4.2,
   Theorem 4.4, Corollary 4.5); kernel (Lemmas 5.1–5.4, Proposition 5.5); parameters and the main inequality
   (Lemma 6.1, Proposition 6.2). Theorem 1 is stated and proved for every γ > 0 and every admissible h; here it
-  is used with γ_d = 10637/78125 and h_d (§6.1).
-* `cutwidth.md` **Theorem 1** (graph side): H(γ_d, h_d) holds with γ_d = 10637/78125 and h_d as in §6.1.
+  is used with γ_d = 2452706089845207/2^54 and h_d (§6.1).
+* `cutwidth.md` **Theorem 1** (graph side): H(γ_d, h_d) holds with γ_d = 2452706089845207/2^54 and h_d as in §6.1.
   Chain: walks, the universal cover and its deck transformations (§1); the non-backtracking-walk field and the
   lifting lemma (§2, Lemmas 2.1–2.3, with tree correlations in closed form and an error bound valid for every
   walk length); Gaussian comparison by interpolation and smoothing, for two fields (Lemma 3.2) and globally on
   the tree (Theorem 3.3); the set maps E, D, the charging inequalities, the window energy f and the global
   submodularity of its formal sum (§4, Lemma 4.4); the tree vector and the reduction of the constant to
-  G_d(t) = V − (3/2)P2 + P3/2 (§5); Proposition C, sup_t G_d(t) <= 10637/78125, stated in §6 and proved in
+  G_d(t) = V − (3/2)P2 + P3/2 (§5); Proposition C, sup_t G_d(t) <= 2452706089845207/2^54, stated in §6 and proved in
   `certificate.md`; ties, threshold grid, concentration and the explicit remainder (§7, with rational
   witnesses (N1)–(N8)).
 * `certificate.md`: the proof of `cutwidth.md` Proposition C. Theorem PL (log-concavity of Gaussian
@@ -164,8 +169,9 @@ Every gate is counted once; inputs, wires and output selection cost nothing. The
   regularity, the layer-cake formula), one-dimensional Gaussian integration by parts, Fourier uniqueness on
   L¹(R) and the generating function of the Hermite polynomials: the list in `cutwidth.md` §1.0.
 * **One finite computation**: `cutwidth.md` Proposition C (sup over all real t of G_d(t) <= γ_d =
-  10637/78125) is established by the program `certify.py` (Python standard
-  library only, its own outward-rounded interval arithmetic), which anyone can run in a few seconds; its method and
+  2452706089845207/2^54) is established by the program `certify.py` (Python standard
+  library only, its own outward-rounded interval arithmetic; `math.sqrt` serves only as the start value of
+  two verified square-root loops), which anyone can run in a few seconds; its method and
   error analysis are in `certificate.md` (§6 there), and its output object reports `certified: true` together
   with the cover and the largest certified bound. The same program re-checks by exhaustive enumeration the
   finite facts (C1), (C2), (C6) and the rational witnesses of `cutwidth.md` §7 (C4), all of which are also
@@ -181,10 +187,12 @@ Lemma 2.3) is used only inside the lower-bound proof.
 
 ### 6.1 Combining `circuit.md` and `cutwidth.md`
 
-`cutwidth.md` Theorem 1 is the hypothesis H(γ,h) of `circuit.md` §0 with γ = γ_d = 10637/78125 and
+`cutwidth.md` Theorem 1 is the hypothesis H(γ,h) of `circuit.md` §0 with γ = γ_d = 2452706089845207/2^54 and
 
-    h_d(D) = (213101/156250)·D                                            for 1 <= D < 2^40,
-    h_d(D) = min{ (213101/156250)·D,  958·D/(log2 D − 3)² + 38·D^{8/9} }    for D >= 2^40.
+    h_d(D) = (24568891674377769/18014398509481984)·D                         for 1 <= D < 2^40,
+    h_d(D) = min{ (24568891674377769/18014398509481984)·D,  958·D/(log2 D − 3)² + 38·D^{8/9} }   for D >= 2^40,
+
+where 24568891674377769/18014398509481984 = 3/2 − γ_d.
 
 `cutwidth.md` Theorem 1 proves cw(K) <= γ_d·D + h_d(D) for every cubic multigraph K on D vertices, connected or
 not, and that h_d is nonnegative, nondecreasing on the positive integers and o(D). Both files use the same class
@@ -193,29 +201,30 @@ loop never crosses a cut, parallel edges count separately) and the same cutwidth
 minimum over orderings; `cutwidth.md` §0 and `circuit.md` Definition 4.3). `circuit.md` applies H(γ,h) only to the
 kernel K of Lemma 5.2, which is a connected cubic multigraph in exactly this sense, on D = 2(s' − n_u) >= 2
 vertices, and evaluates h only at positive integers. So `circuit.md` Theorem 1 applies and gives (★) for every
-integer N >= 256 with c* = 1 + 1/(2γ_d) = 99399/21274 and
+integer N >= 256 with c* = 1 + 1/(2γ_d) = 11459905344586199/2452706089845207 and
 
     R(N) = 5√N + (1/2)√N·log2 N + 2
            + (c* − 1)·[ 7√N + √N·log2 N + 6 + 3·log2(2s_0) + h_d(2s_0) ],     s_0 = ⌈c*·N⌉.
 
-(Here 1/(2γ_d) = c* − 1 = 78125/21274.) For N < 256 one may set R(N) = c*·N; then (★) holds trivially at every
+(Here 1/(2γ_d) = c* − 1 = 2^53/2452706089845207 = 9007199254740992/2452706089845207.) For N < 256 one may
+set R(N) = c*·N; then (★) holds trivially at every
 length.
 
-### 6.2 The leading coefficient: c* = 99399/21274
+### 6.2 The leading coefficient: c* = 11459905344586199/2452706089845207
 
-c* = 1 + 1/(2·10637/78125) = 1 + 78125/21274 = 99399/21274, and this is the leading
-coefficient of the Main Theorem, with exponent 1. It is positive, and the fraction is reduced:
-99399 = 21274 + 78125, so gcd(99399, 21274) = gcd(78125, 21274) = 1, because 78125 = 5⁷ while 21274 = 2·11·967
-is not divisible by 5 (Euclid: 78125 = 3·21274 + 14303, 21274 = 14303 + 6971, 14303 = 2·6971 + 361,
-6971 = 19·361 + 112, 361 = 3·112 + 25, 112 = 4·25 + 12, 25 = 2·12 + 1). Also c* < 5 (5 − c* = 6971/21274) and
-c* − 1 = 78125/21274 < 3.6724 (as 3.6724·21274 = 78126.6376 > 78125).
+c* = 1 + 1/(2·2452706089845207/2^54) = 1 + 2^53/2452706089845207 = 1 + 9007199254740992/2452706089845207 =
+11459905344586199/2452706089845207, and this is the leading coefficient of the Main Theorem, with exponent 1. It is positive, and the fraction is reduced: 11459905344586199 = 2452706089845207 + 2^53
+(2^53 = 9007199254740992), so gcd(11459905344586199, 2452706089845207) = gcd(2^53, 2452706089845207) = 1,
+because 2452706089845207 is odd. Also c* < 5 (5 − c* = 803625104639836/2452706089845207) and
+c* − 1 = 2^53/2452706089845207 = 3.67235164… < 3.6723517 (as 3.6723517·2452706089845207 =
+9007199378643398.6633019 > 2^53).
 
-### 6.3 The remainder: R(N) < (351901/10)·N/(log2 N)² for every N >= 2^200
+### 6.3 The remainder: R(N) < K·N/(log2 N)² for every N >= 2^200
 
 Let N >= 2^200 and L = log2 N >= 200.
 
-* s_0 = ⌈99399N/21274⌉ <= 5N (as (5 − c*)N = 6971N/21274 >= 1), so 2s_0 <= 10N and
-  3·log2(2s_0) <= 3(L + 4).
+* s_0 = ⌈c*·N⌉ = ⌈11459905344586199N/2452706089845207⌉ <= 5N (as (5 − c*)N =
+  803625104639836N/2452706089845207 >= 1), so 2s_0 <= 10N and 3·log2(2s_0) <= 3(L + 4).
 * h_d is nondecreasing and 10N >= 2^40, so h_d(2s_0) <= h_d(10N) <= 958·10N/(log2(10N) − 3)² + 38·(10N)^{8/9}.
   Here log2(10N) − 3 > L (as 10 > 8), and 10^{8/9} < 7.75 (since 7.75⁹ > 10⁸), 38·7.75 = 294.5; so
   h_d(2s_0) < 9580·N/L² + 294.5·N^{8/9}.
@@ -226,31 +235,38 @@ Let N >= 2^200 and L = log2 N >= 200.
   9L³ <= 10⁻⁴·2^{L/2} at L = 200 (9·8·10⁶ = 7.2·10⁷ <= 10⁻⁴·2^100, as 2^100 > 10^30) and L³·2^{−L/2} decreases
   for L > 6/ln 2. Likewise 5√N + (1/2)√N·L + 2 <= L·2^{L/2} <= 10⁻⁴·N/L².
 
-Therefore the bracket is at most (9580 + 2.5 + 0.0001)·N/L² = 9582.5001·N/L², and
+Therefore the bracket is less than (9580 + 2.5 + 0.0001)·N/L² = 9582.5001·N/L² (strictly, because the bound
+on h_d(2s_0) is strict), and as c* − 1 > 0,
 
-    R(N) <= 0.0001·N/L² + (78125/21274)·9582.5001·N/L² < 35190.1·N/L² = (351901/10)·N/(log2 N)²
+    R(N) < [0.0001 + (c* − 1)·9582.5001]·N/L² = K·N/(log2 N)²,
+    K := 0.0001 + (2^53/2452706089845207)·(95825001/10000) = 287704960015153634328733/8175686966150690000
 
-(78125·9582.5001/21274 = 11978125125/340384 < 35190.04, and 0.0001 + 35190.04 = 35190.0401 < 35190.1 = 351901/10).
-Hence, with K = 351901/10, R(N) < K·N/(log2 N)² for every integer N >= 2^200. K is positive and the
-fraction 351901/10 is reduced (351901 is odd and does not end in 0 or 5).
+(35190.31014 < K < 35190.31015). Hence R(N) < K·N/(log2 N)² for every integer N >= 2^200. K is positive and
+the fraction is reduced: with 2452706089845207 = 3·817568696615069 and 95825001 = 3·31941667,
+K = (817568696615069 + 2^53·31941667)/(10⁴·817568696615069); the numerator 817568696615069 + 2^53·31941667 =
+287704960015153634328733 is odd, is ≡ 3 (mod 5) (as 817568696615069 ≡ 4, 2^53 ≡ 2 and 31941667 ≡ 2), and is
+coprime to 817568696615069 because gcd(2^53·31941667, 817568696615069) = gcd(31941667, 817568696615069) = 1
+(817568696615069 is odd; Euclid's remainders: 9416509, 3692140, 2032229, 1659911, 372318, 170639, 31040, 15439,
+162, 49, 15, 4, 3, 1).
 
 ### 6.4 Conclusion
 
 Let N >= N_0 = 2^200 be any integer. By (★), §6.2 and §6.3,
 
-    C_B2(L_N) >= c*·N − R(N) > (99399/21274)·N − (351901/10)·N/(log2 N)².
+    C_B2(L_N) >= c*·N − R(N) > (11459905344586199/2452706089845207)·N − K·N/(log2 N)²,
+    K = 287704960015153634328733/8175686966150690000.
 
 This holds at **every** integer length N >= 2^200, not on a subsequence, for the one fixed language L with its
 one verifier and witness bound 0. This is the Main Theorem, with N_0 = 2^200: an
-eventual lower bound with leading term (99399/21274)·N and the single explicit remainder term
-(351901/10)·N/(log2 N)².
+eventual lower bound with leading term (11459905344586199/2452706089845207)·N and the single explicit remainder
+term K·N/(log2 N)², K = 287704960015153634328733/8175686966150690000.
 
-Corollaries. Let ε > 0 and N >= N_ε = 2^max(200, ⌈√(K/ε)⌉), any integer, K = 351901/10. Then
+Corollaries. Let ε > 0 and N >= N_ε = 2^max(200, ⌈√(K/ε)⌉), any integer, K as in §6.3. Then
 (log2 N)² >= K/ε, so K·N/(log2 N)² <= εN and C_B2(L_N) >= (c* − ε)·N. Since ε > 0 is arbitrary,
 
-    liminf over all integers N of C_B2(L_N)/N >= c* = 99399/21274,
+    liminf over all integers N of C_B2(L_N)/N >= c* = 11459905344586199/2452706089845207,
 
-that is, the constant 99399/21274 with exponent 1.
+that is, the constant 11459905344586199/2452706089845207 with exponent 1.
 
 ## 7. Bit accounting
 

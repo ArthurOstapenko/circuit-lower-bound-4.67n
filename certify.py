@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
-"""certify.py -- the certificate of Proposition C of cutwidth.md:  sup over all real t of G_d(t) <= 10637/78125.
+"""certify.py -- the certificate of Proposition C of cutwidth.md:  sup over all real t of G_d(t) <= gamma_d,
+gamma_d = 2452706089845207/18014398509481984 (the double 0x1.16d72467283aep-3 = 0.13615253867922433...).
 
 Declared experiment.  Python 3.12 standard library only; reads no file; input: one JSON value on stdin (ignored;
 `{}`); output: exactly one JSON object on stdout.  "certified": true is printed only if every check below passed.
 
     echo '{}' | python3 -I -B certify.py
 
-No math-library function enters any bound (math is not imported): every bound is computed with outward-rounded
-interval arithmetic and with the enclosures of exp and of the normal cdf Phi defined in this file, or in exact
-integer/rational arithmetic.  Every statement used is proved in cutwidth.md (sections 4, 5, 7) and certificate.md (whose section 6 names
-the function of this file that implements each bound; Lemmas 5.9-5.12 are in certificate.md).
+Imports: itertools, json, math, sys, time, operator (mul, add), bisect (bisect_left), functools (reduce), fractions.
+The only library function that touches a number of a bound is math.sqrt, used only as the START value of the
+verified square-root loops in isqrt and rootlo (any positive start gives a valid bound; IEEE 754 sqrt is correctly
+rounded, so the run is reproducible bit for bit).  Every bound is computed with outward-rounded interval arithmetic
+and with the enclosures of exp and of the normal cdf Phi defined in this file, or in exact integer/rational arithmetic.
+Every statement used is proved in cutwidth.md (sections 4, 5, 7) and certificate.md (whose section 6 names the
+function of this file that implements each bound; Lemmas 5.9-5.12 are in certificate.md).
 
  (C1) the window energy f (cutwidth.md section 4) on {0,1}^10: range of 2f, flip sizes, mixed differences, the 48
       automorphisms, (k-1)^+ = sum_{i<j} b_i b_j - b_1 b_2 b_3.  Exhaustive, exact.
@@ -31,13 +35,20 @@ Method for (C3) (sections 6.3-6.5 of certificate.md):
           M = 3(t - r1 u), c(u) = sqrt3 u - (2 sqrt6 - 2 sqrt3) t, phi_2 the density of (x1, x2).  Lattice
           u_i = t + i du, v = j dv, sqrt3 du = a e, lam dv = b e: every H argument is (3 sqrt3 - 2 sqrt6) t + J e.
           Each box >= volume * geometric mean of the 8 corner values * (1 + 33 du^2/12)(1 + dv^2/9)^2 (Lemma 5.10).
+          P2 >= the sum over any subset of the boxes (F_t >= 0): boxes with G_j1 G_j2 K(j1,j2) < P2_TAU G_0^2 K(0,0)
+          and, per u-row, boxes with j1 or j2 outside [first, last] j with b_j >= P2_BTAU max b are omitted; the
+          double sum over (j1, j2) is
+          formed over j1 <= j2 with the off-diagonal entries 2K(j1,j2) (exact), a reordering of a sum of nonnegative
+          terms (section 6.2 of certificate.md).
   Leaf [a, b] (Lemma 5.9): P4 and P2 are log-concave in t, so P(t) >= sqrt(pq)(1 + (theta - 1/2) ln(q/p)) for lower
           bounds p, q of P at a, b; Phi(t) <= Phi(m) + phi(m)(t - m) + curvature term; P3 <= P3up(b) (Lemma 5.6).
   Tails: t <= -5/4: G_d <= Phi(-5/4);  t >= 2: G_d <= (7/2) Phi(-2)  (Lemma 5.7).
 Deterministic; no randomness, no threads, no file access.
 """
-import itertools, json, sys, time
-from operator import mul as _mul
+import itertools, json, math, sys, time
+from operator import mul as _mul, add as _add
+from bisect import bisect_left
+from functools import reduce
 from fractions import Fraction as Fr
 
 # ====================================================================================================== (C4)
@@ -45,7 +56,7 @@ from fractions import Fraction as Fr
 # an exact rational statement).  D("1.41421") is the exact rational 141421/100000; PI_Q = (lower, upper) are the
 # exact rational bounds of pi from Machin's formula computed below.
 D = Fr
-GAMMA_D = Fr(10637, 78125)                    # the target constant gamma_d of Proposition C (= 0.1361536)
+GAMMA_D = Fr(2452706089845207, 18014398509481984)   # the target gamma_d of Proposition C: the double 0x1.16d72467283aep-3
 
 def exp_partial(z, terms):                    # partial sum of the exponential series: < e^z for rational z > 0
     s, t = Fr(0), Fr(1)
@@ -82,20 +93,26 @@ WITNESSES = [
 
 # ---- GAMMA_WITNESSES: the statements of section 7 that DO depend on gamma_d (use GAMMA_D); same format.
 GAMMA_WITNESSES = [
-    ("N6 0.0178 < gamma_d = 10637/78125", lambda: D("0.0178") < GAMMA_D == Fr(10637, 78125)),
-    ("N7 38/22 > 213101/156250 = 3/2 - gamma_d and 2^40 < 22^9",
-     lambda: Fr(38, 22) > Fr(213101, 156250) == Fr(3, 2) - GAMMA_D and Fr(2) ** 40 < Fr(22) ** 9),
-    ("N8 1 + 1/(2 gamma_d) = 99399/21274", lambda: 1 + 1 / (2 * GAMMA_D) == Fr(99399, 21274)),
+    ("N6 0.0178 < gamma_d = 2452706089845207/18014398509481984",
+     lambda: D("0.0178") < GAMMA_D == Fr(2452706089845207, 18014398509481984)),
+    ("N7 38/22 > 24568891674377769/18014398509481984 = 3/2 - gamma_d and 2^40 < 22^9",
+     lambda: Fr(38, 22) > Fr(24568891674377769, 18014398509481984) == Fr(3, 2) - GAMMA_D and Fr(2) ** 40 < Fr(22) ** 9),
+    ("N8 1 + 1/(2 gamma_d) = 11459905344586199/2452706089845207",
+     lambda: 1 + 1 / (2 * GAMMA_D) == Fr(11459905344586199, 2452706089845207)),
 ]
 # ============================================================================================================
 
 # ------------------------------------------------------------------ fixed parameters of (C3)
-T_EPS = 0.0015               # eps of the triangle table (a binary64 number; treated as the exact real it is)
+T_EPS = 0.001                # eps of the triangle table (a binary64 number; treated as the exact real it is)
 T_HCHORD, T_HMAX = 2.5, 6.5  # chord rule for h <= T_HCHORD; table up to T_HMAX
-P2_LEVELS = ((0.1, 1, 2), (0.04, 1, 3), (0.011, 1, 3))   # (dv, a, b) of the P2 lattices, coarse to fine
-P2_VMAX, P2_ULEN = 3.5, 0.8
+P2_LEVELS = ((0.1, 1, 2), (0.04, 1, 3), (0.0088, 1, 3))   # (dv, a, b) of the P2 lattices, coarse to fine
+P2_VMAX, P2_ULEN = 4.5, 0.8
 KDEN = 32                    # base intervals [k/32, (k+1)/32], -40 <= k < 64
-MAXDEPTH = 4                 # at most 4 bisections of a base interval
+MAXDEPTH = 5                 # at most 5 bisections of a base interval
+LEVEL_ORDER = (0, 1, 2)      # order in which the P2 lattices are tried on a leaf
+P2_SYM = True                # double sum over j1 <= j2 with entries 2K off the diagonal (a reordering, 6.2)
+P2_BTAU = 3e-05              # per row u_i, the j with b_j < P2_BTAU * max_j b_j are omitted (boxes dropped)
+P2_TAU = 1e-05               # boxes with G_j1 G_j2 K(j1,j2) < P2_TAU * G_0^2 K(0,0) are omitted
 T_LO, T_HI = -1.25, 2.0
 
 # ------------------------------------------------------------------ outward rounding, intervals
@@ -121,7 +138,7 @@ def fr_iv(q):                       # enclosure of a rational (exact comparisons
 def isqrt(a):                       # enclosure of sqrt over a positive interval
     assert a[0] > 0
     def root(x, lower):
-        r = x ** 0.5                # only a starting value; the loops below verify it
+        r = math.sqrt(x)            # only a starting value (IEEE sqrt, correctly rounded); the loops verify it
         assert r > 0
         if lower:
             while up(r * r) > x: r = dn(r)
@@ -198,6 +215,85 @@ def H_lo(z):
     if z <= 1e-150: return 0.0
     if z > 9.0: return 0.9999999999999998
     return dn(2.0 * halfphi_part(z)[0])
+
+# ---- one-sided fast versions (bit-identical: same operations on the same doubles in the same order; only the end
+# of an enclosure that is used is computed; up/dn written out, abs dropped where the argument is >= 0; Horner
+# unrolled (same expression tree; y/n with an int n is y/float(n)); 2n+3 carried as the double den (exact integers);
+# the halving count s of exp_neg found by bisect on the exact powers 2^(s-5) instead of the loop (same s, and
+# y = z*2^-s is exact, as is each halving of the loop).
+#   _elo(z) == exp_neg(z)[0], _ehi(z) == exp_neg(z)[1]  (z <= 0)
+#   hp_lo(x) == halfphi_part(x)[0], hp_hi(x) == halfphi_part(x)[1], phi_lo(x) == Phi_pt(x)[0],
+#   phi_up(x) == Phi_pt(x)[1], H_lo(z) as above, exp_lo(z) as below.
+_ONE_M15, _ONE_P15 = 1.0 - 1e-15, 1.0 + 1e-15
+_POW = [2.0 ** (s - 5) for s in range(0, 40)]      # 2^(s-5): least s with -z <= 2^(s-5)  <=>  loop count of exp_neg
+_INV = [2.0 ** -s for s in range(0, 40)]
+def _elo(z):
+    if z < -700.0: return 0.0
+    s = bisect_left(_POW, -z)
+    y = z * _INV[s]
+    lo = (1.0 + y / 1.0 * (1.0 + y / 2.0 * (1.0 + y / 3.0 * (1.0 + y / 4.0 * (1.0 + y / 5.0 * (1.0 + y / 6.0 * (
+        1.0 + y / 7.0 * (1.0 + y / 8.0 * (1.0 + y / 9.0 * (1.0 + y / 10.0 * (1.0 + y / 11.0 * (1.0 + y / 12.0))))))))))))
+    lo = lo * _ONE_M15
+    lo = lo - (lo * EPS52 + TINY)
+    for _ in range(s):
+        lo = lo * lo; lo = lo - (lo * EPS52 + TINY)
+    return lo
+def _ehi(z):
+    if z < -700.0: return 1e-300
+    s = bisect_left(_POW, -z)
+    y = z * _INV[s]
+    hi = (1.0 + y / 1.0 * (1.0 + y / 2.0 * (1.0 + y / 3.0 * (1.0 + y / 4.0 * (1.0 + y / 5.0 * (1.0 + y / 6.0 * (
+        1.0 + y / 7.0 * (1.0 + y / 8.0 * (1.0 + y / 9.0 * (1.0 + y / 10.0 * (1.0 + y / 11.0 * (1.0 + y / 12.0))))))))))))
+    hi = hi * _ONE_P15
+    hi = hi + (hi * EPS52 + TINY)
+    for _ in range(s):
+        hi = hi * hi; hi = hi + (hi * EPS52 + TINY)
+    return hi
+def _series(ax):
+    x2 = ax * ax
+    T = S = ax
+    n, den = 0, 3.0
+    while True:
+        T = T * x2 / den; n += 1; S += T; den += 2.0
+        if x2 <= 0.5 * den and T <= 1e-17 * S: break
+    return x2, S, T, 5.0 * (n + 2) * 1.1102230246251565e-16
+def hp_hi(ax):
+    x2, S, T, d = _series(ax)
+    v = S + T * (1.0 + d); v = v + (v * EPS52 + TINY)
+    v = v * (1.0 + d); Shi = v + (v * EPS52 + TINY)
+    m = x2 - (x2 * EPS52 + TINY)
+    e = _ehi(-m * 0.5)
+    v = e * INVS2PI[1]; v = v + (v * EPS52 + TINY)
+    v = v * Shi; v = v + (v * EPS52 + TINY)
+    return v if v < 0.5 else 0.5
+def hp_lo(ax):
+    x2, S, T, d = _series(ax)
+    v = S * (1.0 - d); Slo = v - (v * EPS52 + TINY)
+    m = x2 + (x2 * EPS52 + TINY)
+    e = _elo(-m * 0.5)
+    v = e * INVS2PI[0]; v = v - (v * EPS52 + TINY)
+    v = v * Slo
+    return v - (v * EPS52 + TINY)
+def phi_up(x):
+    ax = abs(x)
+    if ax > 9.0: return 1.0 if x > 0 else 1.2e-19
+    if ax < 1e-150: return up(0.5 + 0.4 * ax)
+    if x >= 0:
+        v = 0.5 + hp_hi(ax); v = v + (v * EPS52 + TINY)
+        return v if v < 1.0 else 1.0
+    return up(0.5 - hp_lo(ax))
+def phi_lo(x):
+    ax = abs(x)
+    if ax > 9.0: return 0.9999999999999998 if x > 0 else 0.0
+    if ax < 1e-150: return dn(0.5 - 0.4 * ax)
+    if x >= 0:
+        return dn(0.5 + hp_lo(ax))
+    v = dn(0.5 - hp_hi(ax))
+    return v if v > 0.0 else 0.0
+def H_lo_f(z):
+    if z <= 1e-150: return 0.0
+    if z > 9.0: return 0.9999999999999998
+    return dn(2.0 * hp_lo(z))
 
 def check_mills():
     """(C5): Phi(-9) <= phi(9)/9 <= (2/5) e^(-81/2) / 9 < 1.19e-19 < the float 1.2e-19; 1/sqrt(2 pi) < 2/5"""
@@ -392,14 +488,14 @@ def check_witnesses():
 # ------------------------------------------------------------------ small helpers of (C3)
 def rootlo(x):                      # a float r >= 0 with r*r <= x (x >= 0 a float)
     if x <= 0.0: return 0.0
-    r = x ** 0.5                    # only a starting value; the loop verifies it
+    r = math.sqrt(x)                # only a starting value (IEEE sqrt, correctly rounded); the loop verifies it
     while up(r * r) > x: r = dn(r)
     return r
 def sq_hi(a):                       # upper bound of z^2 for z in the interval a
     return up(max(a[0] * a[0], a[1] * a[1]))
 def exp_lo(z):                      # lower bound of e^z for a float z (either sign, |z| < 700)
-    if z <= 0.0: return exp_neg(z)[0]
-    return dn(1.0 / exp_neg(-z)[1])
+    if z <= 0.0: return _elo(z)                       # == exp_neg(z)[0]
+    return dn(1.0 / _ehi(-z))                         # == dn(1.0 / exp_neg(-z)[1])
 def atanh_iv(y):                    # enclosure of atanh(y), float |y| <= 1/2
     assert abs(y) <= 0.5
     ay = abs(y)
@@ -417,7 +513,9 @@ def log_ratio(p, q):                # enclosure of ln(q/p) for floats p, q > 0, 
 
 # ------------------------------------------------------------------ P4 (and so V = Phi - P4)
 class TriTable:
-    """lower bounds TL[m] <= T(h_m), T(h) = gamma_2(Tri(h)), h_m = m sqrt3 eps, 0 <= m <= M (6.3)"""
+    """lower bounds TL[m] <= T(h_m), T(h) = gamma_2(Tri(h)), h_m = m sqrt3 eps, 0 <= m <= M (6.3)
+    Fast version: every double is the one of the reference code (same operations, same order); the enclosures of
+    m*eta (independent of t) are tabulated once; Phi/exp ends computed one-sided."""
     def __init__(self, eps, hchord=T_HCHORD, hmax=T_HMAX):
         self.eps = eps
         W = imul(S3, pt(eps))                                  # sqrt3 eps
@@ -425,45 +523,64 @@ class TriTable:
         self.M, self.M1, self.W = M, M1, W
         self.eta = imul(idiv(S6, pt(4.0)), pt(eps))            # (sqrt6/4) eps = sqrt3 eps/(3 r1)
         zs = [imul(pt(float(k)), W) for k in range(-2 * M1, M1 + 1)]
-        Pz = [(Phi_pt(z[0])[0], Phi_pt(z[1])[1]) for z in zs]
-        pz = [imul(INVS2PI, exp_iv((-sq_hi(z) * 0.5, -max(0.0, dn(min(z[0] * z[0], z[1] * z[1]))) * 0.5))) for z in zs]
+        Pz = [(phi_lo(z[0]), phi_up(z[1])) for z in zs]
+        pz = [imul(INVS2PI, (_elo(-sq_hi(z) * 0.5), _ehi(-max(0.0, dn(min(z[0] * z[0], z[1] * z[1]))) * 0.5)))
+              for z in zs]
         A, B = [], []
         for k in range(len(zs) - 1):
             dP = isub(Pz[k + 1], Pz[k]); dp = isub(pz[k], pz[k + 1])
             A.append(max(0.0, idiv(isub(imul(zs[k + 1], dP), dp), W)[0]))      # <= int phi(z)(z_{k+1}-z)/w dz
             B.append(max(0.0, idiv(isub(dp, imul(zs[k], dP)), W)[0]))          # <= int phi(z)(z-z_k)/w dz
-        Hs = [H_lo(imul(pt(float(j)), pt(eps))[0]) for j in range(3 * M1 + 2)]
+        Hs = [H_lo_f(dn(float(j) * eps)) for j in range(3 * M1 + 2)]          # == H_lo(imul(pt(j), pt(eps))[0])
+        Hs1 = Hs[1:]
         TL = [0.0]
+        W0 = W[0]
         for m in range(1, M + 1):
             v = 0.0
             if m <= M1:
                 o = 2 * M1 - 2 * m
-                v = sum([a * h0 + b * h1 for a, b, h0, h1 in zip(A[o:o + 3 * m], B[o:o + 3 * m], Hs, Hs[1:])])
+                # same terms a*h0 + b*h1 in the same order, summed by the builtin sum as before
+                v = sum(map(_add, map(_mul, A[o:o + 3 * m], Hs), map(_mul, B[o:o + 3 * m], Hs1)))
                 v = max(0.0, v * (1.0 - 1e-9) - 1e-300)
-            hm = imul(pt(float(m)), W)
-            ub = dn(1.0 - up(3.0 * Phi_pt(-hm[0])[1]))          # T(h) >= 1 - 3 Phi(-h)
+            hm0 = dn(float(m) * W0)                                    # == imul(pt(m), W)[0]  (m >= 1, W > 0)
+            ub = dn(1.0 - up(3.0 * phi_up(-hm0)))                      # T(h) >= 1 - 3 Phi(-h)
             TL.append(max(v, ub))
         self.TL = TL
         self.ST = [rootlo(dn(TL[m] * TL[m + 1])) for m in range(M)]
         self.cst = dn(dn(self.eta[0] * INVS2PI[0]) * dn(1.0 + dn(self.eta[0] * self.eta[0]) / 12.0))
         assert 3 * M1 + 8 <= 100000 and M + 8 <= 100000
+        e0, e1 = self.eta
+        # enclosure of m*eta (m >= 0, eta > 0): imul(pt(m), eta) == (dn(m*e0), up(m*e1))
+        self.MEL = [dn(float(m) * e0) for m in range(M + 1)]
+        self.MEH = [up(float(m) * e1) for m in range(M + 1)]
 
     def P4_lo(self, t):
-        """lower bound of P4(t) for a float t"""
+        """lower bound of P4(t) for a float t (same doubles as the reference P4_lo)"""
         M, eta, ST = self.M, self.eta, self.ST
         c0t = imul(C0, pt(t))
         m0 = 0
         if t > 0.0:
             m0 = int(idiv(imul(isub(C0, pt(1.0)), pt(t)), eta)[1] // 1) + 1     # u_m <= t for m >= m0
         assert m0 < M
-        us = [isub(c0t, imul(pt(float(m)), eta)) for m in range(m0, M + 1)]
-        sq = [sq_hi(u) for u in us]
-        s = 0.0
-        for m in range(m0, M):
-            i = m - m0
-            s += ST[m] * exp_neg(-up(up(sq[i] + sq[i + 1]) * 0.25))[0]
+        c0, c1 = c0t
+        # u_m = isub(c0t, m*eta) = (dn(c0 - MEH[m]), up(c1 - MEL[m])); sq = sq_hi(u_m)
+        sq = []
+        ulo0 = None
+        for mh, ml in zip(self.MEH[m0:M + 1], self.MEL[m0:M + 1]):
+            x = c0 - mh; x = x - (abs(x) * EPS52 + TINY)
+            y = c1 - ml; y = y + (abs(y) * EPS52 + TINY)
+            ulo0 = x
+            x = x * x; y = y * y
+            if y > x: x = y
+            sq.append(x + (x * EPS52 + TINY))
+        args = []
+        for s0, s1 in zip(sq, sq[1:]):
+            w = s0 + s1; w = w + (w * EPS52 + TINY)
+            w = w * 0.25; w = w + (w * EPS52 + TINY)
+            args.append(-w)
+        s = reduce(_add, map(_mul, ST[m0:M], map(_elo, args)), 0.0)       # == the loop s += ST[m]*e (same order)
         s = max(0.0, s * self.cst * (1.0 - 1e-9) - 1e-300)
-        tail = dn(self.TL[M] * Phi_pt(us[-1][0])[0])
+        tail = dn(self.TL[M] * phi_lo(ulo0))
         return dn(s + tail)
 
 # ------------------------------------------------------------------ P2
@@ -476,8 +593,29 @@ class P2Lattice:
         nv = self.nv = int(vmax / dv)
         self.nu = int(ulen / self.du[1])
         d2 = up(dv * dv)
-        self.G = [exp_neg(-up(up((j * j + (j + 1) * (j + 1)) * d2) / 3.0))[0] for j in range(nv)]
-        self.K = [[exp_neg(-up(up((2 * j1 + 1) * (2 * j2 + 1) * d2) / 6.0))[0] for j2 in range(nv)] for j1 in range(nv)]
+        self.G = [_elo(-up(up((j * j + (j + 1) * (j + 1)) * d2) / 3.0)) for j in range(nv)]
+        # K(j1, j2) depends on n = (2j1+1)(2j2+1) only: computed once per n (same double)
+        kc = {}
+        K = []
+        for j1 in range(nv):
+            row = []
+            for j2 in range(nv):
+                n = (2 * j1 + 1) * (2 * j2 + 1)
+                v = kc.get(n)
+                if v is None: v = kc[n] = _elo(-up(up(n * d2) / 6.0))
+                row.append(v)
+            K.append(row)
+        self.K = K
+        # upper-triangular rows with doubled off-diagonal entries (2*K exact), used only if P2_SYM
+        self.KT = [[K[j][j]] + [2.0 * x for x in K[j][j + 1:]] for j in range(nv)] if P2_SYM else None
+        if P2_SYM and P2_TAU > 0.0:
+            # omitted boxes (a subset of nonnegative terms; 6.4(a)): keep (j1, j2) iff G[j1] G[j2] K[j1][j2] >= thr;
+            # decreasing in j2 for fixed j1, symmetric, so row j1 keeps j2 < JM[j1]
+            G0 = self.G; thr = P2_TAU * (G0[0] * G0[0] * K[0][0])
+            for j in range(nv):
+                n = j
+                while n < nv and G0[j] * G0[n] * K[j][n] >= thr: n += 1
+                self.KT[j] = self.KT[j][:n - j]
         du = self.du
         cv = dn(1.0 + dn(dv * dv) / 9.0)                               # <= 1 + (4/3) dv^2 / 12
         corr = dn(dn(1.0 + dn(33.0 * dn(du[0] * du[0])) / 12.0) * dn(cv * cv))
@@ -486,29 +624,59 @@ class P2Lattice:
         self.c0c = isub(imul(pt(3.0), S3), imul(pt(2.0), S6))        # 3 sqrt3 - 2 sqrt6 > 0
         assert self.c0c[0] > 0 and 3 * nv + self.nu + 16 <= 100000 and a >= 1 and b >= 1
         self.calls = 0
+        nJ = a * self.nu + b * nv + 2
+        e0 = self.e[0]
+        self.JEL = [dn(float(J) * e0) for J in range(nJ)]              # == imul(pt(J), e)[0]   (J >= 0, e > 0)
+        du0, du1 = du
+        self.IDL = [dn(float(i) * du0) for i in range(self.nu + 1)]   # imul(pt(i), du) == (IDL[i], IDH[i])
+        self.IDH = [up(float(i) * du1) for i in range(self.nu + 1)]
 
     def lower(self, t):
         g = self; dv, a, bb, nv, nu = g.dv, g.a, g.b, g.nv, g.nu
         g.calls += 1
         c0 = imul(g.c0c, pt(t))
-        nJ = a * nu + bb * nv + 2
-        Hs = [H_lo(iadd(c0, imul(pt(float(J)), g.e))[0]) for J in range(nJ)]
+        c00 = c0[0]
+        Hs = []
+        for x in g.JEL:                                                # == H_lo(iadd(c0, imul(pt(J), e))[0])
+            x = c00 + x
+            Hs.append(H_lo_f(x - (abs(x) * EPS52 + TINY)))
+        nJ = len(Hs)
         Hq = [rootlo(rootlo(dn(dn(Hs[J] * Hs[J + bb]) * dn(Hs[J + a] * Hs[J + a + bb])))) for J in range(nJ - a - bb)]
-        us = [iadd(pt(t), imul(pt(float(i)), g.du)) for i in range(nu + 1)]
+        us = []
+        for l, h in zip(g.IDL, g.IDH):                                 # == iadd(pt(t), imul(pt(i), du))
+            x = t + l; y = t + h
+            us.append((x - (abs(x) * EPS52 + TINY), y + (abs(y) * EPS52 + TINY)))
         Ms = [imul(pt(3.0), isub(pt(t), imul(R1, u))) for u in us]
         u2 = [sq_hi(u) for u in us]; M2 = [sq_hi(m) for m in Ms]
-        G, K = g.G, g.K
+        G, K, KT = g.G, g.K, g.KT
+        sym = KT is not None
         tot = 0.0
+        acc = itertools.accumulate
+        rep = itertools.repeat
         for i in range(nu):
-            Eh = exp_neg(-up(up(up(u2[i] + u2[i + 1]) * 0.25) + up(M2[i] + M2[i + 1])))[0]
+            Eh = _elo(-up(up(up(u2[i] + u2[i + 1]) * 0.25) + up(M2[i] + M2[i + 1])))
             if Eh == 0.0: continue
             r = exp_lo(imul(iadd(Ms[i], Ms[i + 1]), pt(dv))[0])           # <= exp((M_i + M_{i+1}) dv)
             p = rootlo(r)
-            b = []
             o = a * i
-            for j in range(nv):
-                b.append(G[j] * p * Hq[o + bb * j]); p *= r
-            S = sum([bj * sum(map(_mul, b, row)) for bj, row in zip(b, K)])
+            # b_j = (G[j] * p_j) * Hq[o + bb j], p_0 = p, p_{j+1} = p_j * r  (same products, same order)
+            b = list(map(_mul, map(_mul, G, acc(rep(r, nv - 1), _mul, initial=p)), Hq[o:o + bb * nv:bb]))
+            if sym:
+                jlo, jhi = 0, nv
+                if P2_BTAU > 0.0:                                          # omitted boxes: a subset of terms >= 0
+                    cut = max(b) * P2_BTAU
+                    while jhi > 0 and b[jhi - 1] < cut: jhi -= 1
+                    while jlo < jhi and b[jlo] < cut: jlo += 1
+                S = sum([b[j] * sum(map(_mul, b[j:min(j + len(KT[j]), jhi)], KT[j])) for j in range(jlo, jhi)])
+            else:
+                jlo = 0
+                while jlo < nv and b[jlo] == 0.0: jlo += 1                 # zero items are no-ops of sum (see 6.2)
+                if jlo == nv: continue                                     # S = 0: tot += Eh*0.0 leaves tot
+                if jlo == 0:
+                    S = sum([bj * sum(map(_mul, b, row)) for bj, row in zip(b, K)])
+                else:
+                    bs = b[jlo:]
+                    S = sum([bj * sum(map(_mul, bs, row[jlo:])) for bj, row in zip(bs, K[jlo:])])
             tot += Eh * S
         return max(0.0, tot * g.cst * (1.0 - 1e-9) - 1e-300)
 
@@ -582,7 +750,7 @@ def certify(G=GAMMA_D, out=None):
         while stack and failed is None:
             a, b, d = stack.pop()
             done = False
-            for lev in range(len(P2_LEVELS)):
+            for lev in LEVEL_ORDER:
                 U = leaf_bound(a, b, p4(a), p4(b), p2(a, lev), p2(b, lev))
                 if le(U):
                     leaves.append((a, b, U, "L%d" % lev)); done = True; break

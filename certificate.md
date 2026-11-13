@@ -1,8 +1,9 @@
-# The certificate of Proposition C: sup_t G_d(t) <= 10637/78125
+# The certificate of Proposition C: sup_t G_d(t) <= 2452706089845207/18014398509481984
 
 **Status.** This file is the companion of `cutwidth.md` for its Proposition C. It proves: *if the output of the
 program `certify.py` (which runs in a few seconds) has "certified": true, then
-G_d(t) ≤ γ_d := 10637/78125 for every real t.* Labels as in `cutwidth.md`: [P] = proved here from undergraduate
+G_d(t) ≤ γ_d := 2452706089845207/18014398509481984 = 2452706089845207·2^{−54} (the binary64 number
+0x1.16d72467283aep-3 = 0.13615253867922433…) for every real t.* Labels as in `cutwidth.md`: [P] = proved here from undergraduate
 analysis and probability (§1.0 of `cutwidth.md`) and the items of `cutwidth.md` named below; [C] = checked by
 `certify`; [S] = not used in any proof.
 
@@ -159,7 +160,8 @@ positive on the box, and there log H(affine) is concave because H is positive an
 
 ## 6. The certificate (Proposition C)
 
-Here γ_d = 10637/78125. The program `certify.py` (Python standard library, reads
+Here γ_d = 2452706089845207/18014398509481984 (= 0x1.16d72467283aep-3, the largest leaf bound of the recorded run;
+see 6.6). The program `certify.py` (Python standard library, reads
 no file) checks finitely many instances of Lemma 5.9(c) and the tails of Lemma 5.7. This section proves: *if its
 output has "certified": true, then G_d(t) ≤ γ_d for all real t* (Proposition C). Function names: `certify.py`.
 
@@ -168,13 +170,13 @@ output has "certified": true, then G_d(t) ≤ γ_d for all real t* (Proposition 
 head of `certify.py`) hold; an exception gives "certified": false.
 (i) *Tails.* Upper bounds (6.2) of Φ(−5/4) and of (7/2)Φ(−2) are ≤ γ_d. By Lemma 5.7, G_d(t) ≤ Φ(t) ≤ Φ(−5/4) for
 t ≤ −5/4 and G_d(t) ≤ (7/2)Φ(−t) ≤ (7/2)Φ(−2) for t ≥ 2.
-(ii) *Leaves.* Each base interval [k/32, (k+1)/32], −40 ≤ k < 64, is bisected (at most 4 times; all ends are dyadic
-rationals with denominator ≤ 2⁹, exact in binary64; the program re-checks 2m = a + b and w = b − a in rationals)
+(ii) *Leaves.* Each base interval [k/32, (k+1)/32], −40 ≤ k < 64, is bisected (at most 5 times; all ends are dyadic
+rationals with denominator ≤ 2^10, exact in binary64; the program re-checks 2m = a + b and w = b − a in rationals)
 until each leaf [a, b] is accepted. For a leaf and a lattice level ℓ ∈ {0, 1, 2} the program computes binary64
 numbers p_a ≤ P4(a), p_b ≤ P4(b) (6.3) and p′_a ≤ P2(a), p′_b ≤ P2(b) (6.4, lattice ℓ) and a binary64 number U
 that is ≥ the smaller of the right sides of (5.3) and (5.2) (6.5). The leaf is accepted at the first ℓ with U ≤ γ_d,
 compared exactly (`Fraction(U) <= GAMMA_D`). No leaf straddles 0. By Lemma 5.9(c), G_d ≤ U ≤ γ_d on every accepted
-leaf. A leaf not accepted at depth 4 makes the run fail ("failed_leaf": not certified). The values p, p′ are cached
+leaf. A leaf not accepted at depth 5 makes the run fail ("failed_leaf": not certified). The values p, p′ are cached
 per point (and level); this affects only the running time.
 (iii) *Cover.* From the list of accepted leaves the program checks in exact rationals that the first leaf starts at
 −5/4, the last ends at 2, each leaf ends where the next begins, no leaf has a < 0 < b, and every stored U is ≤ γ_d
@@ -184,6 +186,12 @@ per point (and level); this affects only the running time.
 fl(z) the double nearest to the real z, u := 2^{−53}. Each of +, −, ×, ÷ on doubles returns fl of the exact
 result, so |fl(z) − z| ≤ u|z| if |z| ≥ 2^{−1022} and ≤ 2^{−1075} otherwise; multiplication by 2 or 1/2 is
 exact without underflow. All numbers in the program are below 10^6 in modulus, so there is no overflow.
+*Library.* `certify.py` imports `itertools`, `json`, `math`, `sys`, `time`, `operator` (`mul`, `add`), `bisect`
+(`bisect_left`), `functools` (`reduce`) and `fractions` (`Fraction`). No library function computes a number that
+enters a bound, except as a *start value* that the program then verifies: `math.sqrt` in `isqrt` and `rootlo`
+(below), and `float` of a `Fraction` in `fr_iv`. `operator.mul`/`add` (applied through `map`, `functools.reduce`,
+`itertools.accumulate`) are the binary64 operations ×, +; `bisect_left` only compares doubles; the builtin `sum` is
+treated below; `json`, `sys`, `time` only do input/output and timing; `itertools` also enumerates (C1), (C6).
 
 *up, dn.* `up(x)` := fl(x + fl(fl(|x|·2^{−52}) + 2^{−1074})), `dn(x)` := −up(−x). Claim: if fl(z) = x then
 dn(x) ≤ z ≤ up(x). Proof: let x⁺ be the double following x; z ≤ x⁺ since fl(z) = x. If 2^e ≤ |x| < 2^{e+1}
@@ -196,8 +204,10 @@ operation with exact result z, then z ∈ [dn(q), up(q)].
 the ends (all four products or quotients, then min and max; `idiv` asserts 0 ∉ divisor) and then dn to the
 lower and up to the upper end. The exact result for any reals in the operands lies between the exact extreme
 end combinations, which lie in [dn(min), up(max)] by the claim. `fr_iv(q)` moves a double by dn/up until exact
-rational comparison shows lo ≤ q ≤ hi. `isqrt`: a start value r is decreased by dn until up(r·r) ≤ x; then
-r² ≤ up(fl(r²)) ≤ x, so r ≤ √x; symmetrically for the upper end.
+rational comparison shows lo ≤ q ≤ hi. `isqrt`: the start value r := `math.sqrt(x)` is decreased by dn until up(r·r) ≤ x;
+then r² ≤ up(fl(r²)) ≤ x, so r ≤ √x; symmetrically for the upper end (increase by up until dn(r·r) ≥ x). Any
+positive start value gives a valid enclosure (the loops verify it); `math.sqrt` is the IEEE 754 square root, which
+is correctly rounded, so with it the result, and with it the whole run, is reproducible bit for bit.
 
 *Constants* (`init_constants`). π: Machin's formula π = 16·arctan(1/5) − 4·arctan(1/239) with partial sums of
 the alternating series Σ(−1)^k x^{2k+1}/(2k+1), which bracket arctan x for 0 < x < 1 (odd number of terms
@@ -206,7 +216,7 @@ lo²·2·PI_Q[1] ≤ 1 ≤ hi²·2·PI_Q[0] in exact rationals. √2, √3, √6
 λ = 2√6/3, κ = 6√2 − 8, c_0 = 3/(2√2), 3/π by interval operations.
 
 *exp* (`exp_neg(z)`, z ≤ 0 a double). If z < −700 it returns (0, 10^{−300}) ∋ e^z (e^7 > 2^{10}, so e^{700} >
-2^{1000} > 10^{300}). Else y := z/2^s exactly, s ≤ 15 least with y ≥ −1/32, and p̃ is the Horner value of
+2^{1000} > 10^{300}). Else y := z/2^s exactly, s ≤ 15 least with y ≥ −1/32 (found by `bisect_left` on the exact powers 2^{s−5}), and p̃ is the Horner value of
 P(y) := Σ_{n≤12} yⁿ/n!: p_13 = 1, p_n = 1 + (y/n)p_{n+1}. All exact p_n and computed p̃_n lie in [0.96, 1].
 With e_n := |p̃_n − p_n|: the computed product fl(fl(y/n)·p̃_{n+1}) differs from (y/n)p̃_{n+1} by at most
 (1/32)(2u + u²) + 2^{−1074}, and the final addition adds an error ≤ u; so e_n ≤ e_{n+1}/32 + 1.07u, whence
@@ -215,6 +225,10 @@ e_1 ≤ 1.07u·32/31 < 1.2u. By Taylor's theorem |e^y − P(y)| ≤ |y|^{13}/13!
 p̃(1 − 8·10^{−16}) ≤ e^y ≤ p̃(1 + 8·10^{−16}) ≤ up(fl(p̃·fl(1 + 10^{−15}))). Then s times (lo, hi) ← (dn(lo²),
 up(hi²)): as 0 ≤ lo ≤ e^w ≤ hi implies dn(lo²) ≤ e^{2w} ≤ up(hi²) (lo stays > 0: e^z ≥ e^{−700}), the result
 encloses e^z. `exp_iv` uses the lower value at the lower end and the upper value at the upper end.
+*One-sided versions.* `_elo`, `_ehi` return the lower, upper end of `exp_neg`; `hp_lo`, `hp_hi` those of
+`halfphi_part`; `phi_lo`, `phi_up` those of `Phi_pt`; `H_lo_f` equals `H_lo`. Each performs exactly the operations
+that produce the end it returns, in the same order (up/dn written out; |x| replaced by x where x ≥ 0), so it returns
+the same double and everything said here about the two-sided functions holds for it.
 
 *Φ* (`halfphi_part`, `Phi_pt`, `H_lo`). For x ≥ 0, Φ(x) − 1/2 = φ(x)S(x), S(x) := Σ_{n≥0}T_n,
 T_n := x^{2n+1}/(2n+1)!! (both sides vanish at 0 and have derivative φ(x): S′ = 1 + xS termwise). Let
@@ -238,17 +252,20 @@ double 0.9999999999999998 > 2.4·10^{−19}: check (C5), exact; so (0, 1.2e-19) 
 0.9999999999999998 for z > 9, else dn of twice (exact) the lower end of `halfphi_part(z)`.
 
 *Sums of nonnegative bounds.* In 6.3, 6.4 sums of products of nonnegative doubles are formed in plain
-arithmetic. If every summand passes through at most n ≤ 10^5 roundings (its own products and the later
-additions), the computed sum Σ̃ and the exact sum Σ of the same doubles satisfy (1 − u)^nΣ − ρ ≤ Σ̃ ≤
-(1 + u)^nΣ + ρ, ρ < 10^9·2^{−1074} (underflow, fewer than 10^9 operations); as (1 + u)^{10^5} < 1 + 1.2·10^{−11},
-Σ̃(1 + 10^{−9}) + 10^{−300} ≥ Σ and Σ̃(1 − 10^{−9}) − 10^{−300} ≤ Σ, also after the roundings of these last
-operations. The program asserts n ≤ 10^5. Where the builtin `sum` is applied to a list of nonnegative doubles the
-same bounds hold: `sum` adds the items from left to right, and in CPython ≥ 3.12 it does so with a compensated
+arithmetic: by a loop, by `functools.reduce(add, …, 0.0)` (the same left-to-right additions), or by the builtin
+`sum`, in the order and grouping stated in 6.3, 6.4. If every summand passes through at most n ≤ 10^5 roundings (its
+own products and the later additions), the computed sum Σ̃ and the exact sum Σ of the same doubles satisfy
+(1 − u)^nΣ − ρ ≤ Σ̃ ≤ (1 + u)^nΣ + ρ, ρ < 10^9·2^{−1074} (underflow, fewer than 10^9 operations); this holds for
+every order and grouping of the additions and multiplications, since each rounding of a sum or product of
+nonnegative numbers multiplies the exact intermediate result by a factor in [1 − u, 1 + u] (up to underflow). As
+(1 + u)^{10^5} < 1 + 1.2·10^{−11}, Σ̃(1 + 10^{−9}) + 10^{−300} ≥ Σ and Σ̃(1 − 10^{−9}) − 10^{−300} ≤ Σ, also after the
+roundings of these last operations. The program asserts n ≤ 10^5. Where the builtin `sum` is applied to a list or an
+iterator of nonnegative doubles the same bounds hold: `sum` adds the items from left to right, and in CPython ≥ 3.12 it does so with a compensated
 scheme whose result is at least as close to the exact sum of the items (relative difference below 10^{−13} for
 nonnegative items), which the factors (1 ± 10^{−9}) cover as well.
 
-*Further helpers.* *rootlo(x)* (x ≥ 0 a double): 0 if x = 0; else a start value r is decreased by dn until up(r·r) ≤ x; then
-r² ≤ up(fl(r²)) ≤ x, so 0 < r ≤ √x (as in `isqrt`).
+*Further helpers.* *rootlo(x)* (x ≥ 0 a double): 0 if x ≤ 0; else the start value r := `math.sqrt(x)` is decreased
+by dn until up(r·r) ≤ x; then r² ≤ up(fl(r²)) ≤ x, so 0 < r ≤ √x (as in `isqrt`; any positive start is valid).
 *sq_hi((lo, hi))* := up(max(fl(lo²), fl(hi²))) ≥ z² for every z ∈ [lo, hi] (z² ≤ max(lo², hi²)).
 *exp_lo(z)*: for z ≤ 0 the lower end of `exp_neg(z)`; for z > 0, dn(fl(1/h)) with h the upper end of
 `exp_neg(−z)`: e^{−z} ≤ h gives e^z ≥ 1/h.
@@ -261,7 +278,7 @@ and up adds at least one such spacing). For y < 0 it returns the negative of the
 (q − p)/(q + p); if x ⊄ [−1/2, 1/2] the function returns None (then only (5.3), or (5.2) with min(p′, q′), 0, is
 used); otherwise, atanh being increasing, it returns (2·lower end of atanh_iv(x_lo), 2·upper end of atanh_iv(x_hi)).
 
-**6.3 P̲4** (`TriTable`, `TriTable.P4_lo(t)`) [P]. Let ε = 0.0015 (the double), ω := √3ε, h_m := mω (0 ≤ m ≤ M,
+**6.3 P̲4** (`TriTable`, `TriTable.P4_lo(t)`) [P]. Let ε = 0.001 (the double), ω := √3ε, h_m := mω (0 ≤ m ≤ M,
 M = ⌊6.5/ω̄⌋, ω̄ the upper end of the enclosure of ω), z_k := kω, M_1 := ⌊2.5/ω̄⌋.
 (a) *Table: T̲_m ≤ T(h_m).* T̲_0 := 0 = T(0). For 1 ≤ m ≤ M, by Lemma 5.11(a),
 T(h_m) = Σ_{k=−2m}^{m−1} ∫_{z_k}^{z_{k+1}} φ(z)H((z + 2h_m)/√3)dz, and on the k-th cell the argument (z + 2h_m)/√3
@@ -299,8 +316,8 @@ dn(T̲_M·(lower end of Φ at the lower end of the enclosure of u_M)).
 `P4_lo(t)` returns dn of the sum of (c) and (d): a lower bound of P4(t). ∎
 
 **6.4 P̲2** (`P2Lattice(dv, a, b)`, `P2Lattice.lower(t)`) [P]. Three lattices ("levels") are used, with
-(Δ_v, a, b) = (0.1, 1, 2), (0.04, 1, 3), (0.011, 1, 3) (Δ_v a double, a, b positive integers). Put
-e := λΔ_v/b, Δ_u := ae/√3 = (a/b)r_1Δ_v, n_v := ⌊3.5/Δ_v⌋, n_u := ⌊0.8/Δ̄_u⌋ (Δ̄_u the upper end of the enclosure), and
+(Δ_v, a, b) = (0.1, 1, 2), (0.04, 1, 3), (0.0088, 1, 3) (Δ_v a double, a, b positive integers). Put
+e := λΔ_v/b, Δ_u := ae/√3 = (a/b)r_1Δ_v, n_v := ⌊4.5/Δ_v⌋, n_u := ⌊0.8/Δ̄_u⌋ (Δ̄_u the upper end of the enclosure), and
 
     u_i := t + iΔ_u (0 ≤ i ≤ n_u),   v_j := jΔ_v (0 ≤ j ≤ n_v),   M_i := 3(t − r_1u_i).
 
@@ -324,7 +341,8 @@ v̄_j = (j + 1/2)Δ_v; the mean of v_{j_1′}v_{j_2′} is v̄_{j_1}v̄_{j_2}):
     Q(J) := [H(c_t + Je)·H(c_t + (J+b)e)·H(c_t + (J+a)e)·H(c_t + (J+a+b)e)]^{1/4}.
 
 Hence P2(t) ≥ C·Σ_{i<n_u} E_i·Σ_{j_1<n_v} β_i(j_1)·Σ_{j_2<n_v} β_i(j_2)K(j_1, j_2), with
-C := Δ_uΔ_v²(1 + 33Δ_u²/12)(1 + Δ_v²/9)²/(√(2π)√3π).
+C := Δ_uΔ_v²(1 + 33Δ_u²/12)(1 + Δ_v²/9)²/(√(2π)√3π). The same holds with the sum restricted to any set of boxes
+(each omitted box contributes ∫ F_t ≥ 0, and the remaining boxes still have disjoint interiors in the region).
 (c) *Evaluation.* Every factor is replaced by a nonnegative double not larger than it:
 exp(−(v_j² + v_{j+1}²)/3) and K(j_1, j_2) by lower ends of `exp_neg` at −up(up(n·up(Δ_v²))/3), n = j² + (j+1)², resp.
 −up(up(n·up(Δ_v²))/6), n = (2j_1+1)(2j_2+1) (n an integer, exact); E_i by the lower end of `exp_neg` at minus an
@@ -333,10 +351,22 @@ r := `exp_lo` at the lower end of the interval product (M_i + M_{i+1})·Δ_v; ρ
 π_0 := rootlo(r), π_j := fl(π_{j−1}·r); H(c_t + Je) by `H_lo` at the lower end of the enclosure of c_t + Je (H is
 nondecreasing); Q(J) by rootlo(rootlo(dn(dn(·)·dn(·)))) of the four lower bounds (if r_1² ≤ x and r_2² ≤ r_1 then
 r_2⁴ ≤ x); C by the lower end of the interval product Δ_uΔ_v²·(1/√(2π))·(1/(√3π)) times
-dn(dn(1 + dn(33·dn(Δ̲_u²))/12)·dn(c_v·c_v)), c_v := dn(1 + dn(Δ_v²)/9). The triple sum is then formed in plain
-arithmetic; it is a sum of nonnegative bounds in which every summand passes through at most 3n_v + n_u + 16
-roundings (asserted ≤ 10⁵; π_j carries j of them), so by 6.2 the returned value
-max(0, Σ̃·C̲·(1 − 10^{−9}) − 10^{−300}) is ≤ P2(t). Terms with E_i rounded to 0 are skipped (they are ≥ 0). ∎
+dn(dn(1 + dn(33·dn(Δ̲_u²))/12)·dn(c_v·c_v)), c_v := dn(1 + dn(Δ_v²)/9). Write b̃_j := fl(fl(G̃_j·π_j)·Q̃(ai + bj)) for the double replacing
+β_i(j) (G̃_j, K̃(j_1, j_2), Q̃ the doubles just described), Ẽ_i for that of E_i.
+*Omitted boxes* (by (b), a lower bound remains a lower bound): (1) rows i with Ẽ_i = 0; (2) a fixed set per lattice:
+with thr := fl(10^{−5}·fl(fl(G̃_0·G̃_0)·K̃(0, 0))) (`P2_TAU` = 1e-5) and, for each j_1, J(j_1) := the least n ≥ j_1 with
+fl(fl(G̃_{j_1}·G̃_n)·K̃(j_1, n)) < thr (or n_v), only the pairs with j_1 ≤ j_2 < J(j_1) are kept, together with their
+mirror images (j_2, j_1); (3) per row i: with cut := fl(max_j b̃_j·3·10^{−5}) (`P2_BTAU` = 3e-5), j_lo := the least j with
+b̃_j ≥ cut and j_hi := 1 + the largest such j, only j_1, j_2 ∈ [j_lo, j_hi) are kept. The kept set of ordered pairs
+is symmetric; every omitted term is ≥ 0.
+*Evaluation of the kept sum.* For row i, S̃_i := `sum` over j_1 ∈ [j_lo, j_hi), in increasing order, of
+fl(b̃_{j_1}·Σ̃_{j_1}), where Σ̃_{j_1} := `sum` over j_2 from j_1 to min(J(j_1), j_hi) − 1 of fl(b̃_{j_2}·K̃′(j_1, j_2)), with
+K̃′(j, j) := K̃(j, j) and K̃′(j_1, j_2) := 2K̃(j_1, j_2) (exact) for j_2 > j_1. Since K̃(j_1, j_2) and K̃(j_2, j_1) are the
+same double (computed from the same integer n), the exact value of this expression with exact operations is the sum,
+over the kept ordered pairs, of b̃_{j_1}b̃_{j_2}K̃(j_1, j_2); the program forms Σ̃ := Σ_i fl(Ẽ_i·S̃_i) (left to right).
+This is a sum of nonnegative bounds in which every summand passes through at most 3n_v + n_u + 16 roundings (asserted
+≤ 10⁵; π_j carries j of them; the factor 2 is exact), so by 6.2 (any order and grouping) the returned value
+max(0, Σ̃·C̲·(1 − 10^{−9}) − 10^{−300}) is ≤ P2(t). ∎
 
 **6.5 The leaf value, P3, the tails** [P]. `P3_up(b)`: 0 for b ≤ 0; else c_1, c_2 := the upper
 ends of the interval evaluations of (1/r_1 − 1)/√(2π) and 18(1 − r_1)² (so they are admissible in Lemma 5.6), and
@@ -361,11 +391,26 @@ base intervals and leaves, contiguity; "counts": number of points at which P̲4 
 the table and lattice sizes; "largest_certified_bound", "argmax_interval": the largest U (rounded up), its leaf;
 "leaves_by_method": number of leaves accepted at each level; "block_table": leaves and largest U per block of
 length 1/4; "leaf_table": 60 consecutive leaves [a, b, U rounded up, level] around the largest.
-Recorded run (Python 3.12.13, one core, about 3.6 s; the run is deterministic): certified true; tails 0.105649774
-and 0.079625462; 104 base intervals, 114 leaves, contiguous; P̲4 at 115 points (ε = 0.0015, M = 2501, M_1 = 962);
-P̲2 at 115, 15, 13 points on the three levels (n_v = 35, 87, 318; n_u = 16, 63, 231); leaves by level
-100, 5, 9; largest U = 0.136153400 on [3/64, 7/128]; all of C1–C6 ok; output 4767 bytes. [S] The maximum
-of G_d is about 0.1361516 (near t = 0.0404). If only the line `GAMMA_D = Fr(10637, 78125)` is changed to
-2723/20000 = 0.13615 or to 1361/10000, the run is not certified: (C3) fails ("failed_leaf" [17/512, 9/256] with
-U = 0.136151287, resp. [3/256, 7/512] with U = 0.136102200), and (C4) fails as well, its three γ-dependent
-witnesses being stated for 10637/78125.
+Recorded run (CPython 3.12.13, arm64, one core, about 3.4 s; the run is deterministic): certified true; tails
+0.105649774 and 0.079625462; 104 base intervals, 119 leaves, contiguous; P̲4 at 120 points (ε = 0.001, M = 3752,
+M_1 = 1443); P̲2 at 120, 20, 18 points on the three levels (n_v = 45, 112, 511; n_u = 16, 63, 289); leaves by level
+100, 5, 14, by depth 0, …, 5: 101, 3, 3, 3, 3, 6; largest U = 0.136152539 on [41/1024, 21/512] (level 2, depth 5);
+all of C1–C6 ok; output 4823 bytes. [S] The maximum of G_d is about 0.1361516 (near t = 0.0404).
+*Choice of γ_d.* γ_d is the largest leaf bound L of this run: the double 0x1.16d72467283aep-3 =
+2452706089845207/18014398509481984, the U of the leaf [41/1024, 21/512]. Every U the run computes (197 values) is
+either ≤ L (the 119 accepted ones) or ≥ U_rej := 0x1.16d72945b131dp-3 = 4905413486777117/36028797018963968 =
+0.13615257495816815… (the smallest rejected value, leaf [19/512, 5/128] at level 2 and depth 4, which is then
+bisected). The target enters (C3) only through the exact comparisons U ≤ γ_d, so (C3) runs identically, with every
+double the same, for every target in [L, U_rej), in particular for γ_d = L. The witnesses N6–N8 of (C4) are stated
+for this γ_d: 0.0178 < γ_d; 38/22 > 3/2 − γ_d = 24568891674377769/18014398509481984 and 2^40 < 22^9;
+1 + 1/(2γ_d) = 11459905344586199/2452706089845207.
+*Negative controls.* If only the line `GAMMA_D = …` is changed, the run is not certified: to the double one ulp below
+L (4905412179690413/36028797018963968), (C3) fails at the leaf [41/1024, 21/512] at depth 5 ("failed_leaf", last
+level's U = 0.136152539 rounded up); to 2723/20000 = 0.13615, at [35/1024, 9/256] (depth 5, U = 0.136150593); to
+1361/10000, at [13/1024, 7/512] (depth 5, U = 0.136101509); in all three (C4) fails as well (N6–N8 are stated for L).
+*Reproducibility.* Every double of the run is determined by binary64 arithmetic with round to nearest: +, −, ×, ÷,
+comparisons, exact conversions of small integers, decimal literals (correctly rounded by CPython), `math.sqrt` start
+values (correctly rounded by IEEE 754), `float` of a `Fraction` as the start value in `fr_iv` (correctly rounded by
+CPython), and the builtin `sum` on floats, which in CPython ≥ 3.12 is the compensated (Neumaier) summation, so the
+bits are those of CPython 3.12; the comparisons with γ_d and the checks (C1), (C2), (C4)–(C6) are in exact integer or
+rational arithmetic. The recorded run used CPython 3.12.13.
